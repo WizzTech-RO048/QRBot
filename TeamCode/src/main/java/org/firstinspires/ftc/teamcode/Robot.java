@@ -5,6 +5,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+<<<<<<< HEAD
+=======
+// testing
+>>>>>>> origin/main
 public class Robot {
     private DcMotor leftFront, leftRear, rightFront, rightRear;
 
