@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Robot {
     private DcMotor leftFront, leftRear, rightFront, rightRear;
+    private DcMotor sbinPahar;
 
     private boolean _turbo;
 
@@ -15,6 +16,8 @@ public class Robot {
         leftRear = hardwareMap.dcMotor.get("lr");
         rightFront = hardwareMap.dcMotor.get("rf");
         rightRear = hardwareMap.dcMotor.get("rr");
+
+        sbinPahar = hardwareMap.dcMotor.get("sp");
 
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -30,6 +33,7 @@ public class Robot {
     }
 
     public void stop() {
+        sbinPahar.setPower(0);
         setMotors(0, 0, 0, 0, _turbo);
     }
 
@@ -51,6 +55,10 @@ public class Robot {
         final double rr = speed * Math.sin(direction + Math.PI / 4.0); // + rotation;
 
         setMotors(lf, lr, rf, rr, _turbo);
+    }
+
+    public void sbin(){
+        sbinPahar.setPower(1);
     }
 
     public void toggleTurbo() { _turbo = !_turbo; }

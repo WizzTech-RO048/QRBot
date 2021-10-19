@@ -52,7 +52,6 @@ import java.util.concurrent.TimeUnit;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-@TeleOp(name="QR Navigator")
 @Autonomous(name="QR Navigator")
 public class QR_Nav extends LinearOpMode {
 
@@ -77,13 +76,13 @@ public class QR_Nav extends LinearOpMode {
         callbackHandler = CallbackLooper.getDefault().getHandler();
 
         cameraManager = ClassFactory.getInstance().getCameraManager();
-        cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        cameraName = hardwareMap.get(WebcamName.class, "Webcam");
 
         robot = new Robot(hardwareMap);
         gripper = hardwareMap.servo.get("gripper");
 
         gripper.setPosition(0.5);
-        cameraName = hardwareMap.get(WebcamName.class, "Webcam");
+        // cameraName = hardwareMap.get(WebcamName.class, "Webcam");
 
         initFrameQueue(2);
 
@@ -131,6 +130,16 @@ public class QR_Nav extends LinearOpMode {
 
             switch(instruction) {
                 case "5" :
+                    try{
+                        robot.sbin();
+
+                        Thread.sleep(3000);
+                        robot.stop();
+
+                    } catch (Exception e) {}
+
+                    break;
+                case "2" :
                     try {
                         robot.moveForward();
 
