@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.os.Handler;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 
@@ -16,12 +17,15 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.Reader;
 import com.google.zxing.Result;
+import com.google.zxing.ResultPoint;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -41,7 +45,6 @@ import org.firstinspires.ftc.robotcore.internal.collections.EvictingBlockingQueu
 import org.firstinspires.ftc.robotcore.internal.network.CallbackLooper;
 import org.firstinspires.ftc.robotcore.internal.system.ContinuationSynchronizer;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -49,6 +52,7 @@ import java.util.concurrent.TimeUnit;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
+@TeleOp(name="QR Navigator")
 @Autonomous(name="QR Navigator")
 public class QR_Nav extends LinearOpMode {
 
@@ -60,10 +64,12 @@ public class QR_Nav extends LinearOpMode {
     private WebcamName cameraName;
     private Camera camera;
     private CameraCaptureSession cameraCaptureSession;
-
     private EvictingBlockingQueue<Bitmap> frameQueue;
 
     private Handler callbackHandler;
+
+    private Robot robot;
+    private Servo gripper;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -71,6 +77,12 @@ public class QR_Nav extends LinearOpMode {
         callbackHandler = CallbackLooper.getDefault().getHandler();
 
         cameraManager = ClassFactory.getInstance().getCameraManager();
+        cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+        robot = new Robot(hardwareMap);
+        gripper = hardwareMap.servo.get("gripper");
+
+        gripper.setPosition(0.5);
         cameraName = hardwareMap.get(WebcamName.class, "Webcam");
 
         initFrameQueue(2);
@@ -80,45 +92,64 @@ public class QR_Nav extends LinearOpMode {
             if(camera == null) {
                 telemetry.addData("ERROR: ", "cannot open camera");
                 telemetry.update();
-
                 return;
             }
-
             startCamera();
             if(cameraCaptureSession == null) {
                 telemetry.addData("ERROR: ", "cannot start camera");
                 telemetry.update();
-
                 return ;
             }
-
             waitForStart();
-
             telemetry.clear();
-
             telemetry.addData("> ", "Started");
             telemetry.update();
 
             while(opModeIsActive()) {
+                if(gamepad1.a) gripper.setPosition(0.7);
+                if(gamepad1.b) gripper.setPosition(0.3);
+
                 Bitmap bmp = frameQueue.poll();
 
                 if(bmp != null) {
                     onNewFrame(bmp);
                 }
-
                 telemetry.update();
             }
         } finally {
             closeCamera();
         }
     }
-
     private void onNewFrame(Bitmap frame) {
         String instruction = readQRCode(frame);
 
         if(instruction != null) {
             telemetry.addData("Instruction", instruction);
+            telemetry.addData("Turbo", robot.isTurbo());
+
             telemetry.update();
+
+            switch(instruction) {
+                case "5" :
+                    try {
+                        robot.moveForward();
+
+                        Thread.sleep(1000);
+                        robot.stop();
+                    } catch (Exception e) {}
+
+                    break;
+
+                case "4":
+                    try {
+                        robot.turn(10);
+
+                        Thread.sleep(2000);
+                        robot.stop();
+                    } catch (Exception e) {}
+
+                    break;
+            }
         }
     }
 
@@ -134,35 +165,26 @@ public class QR_Nav extends LinearOpMode {
             }
         });
     }
-
     private void openCamera() {
         if(camera != null) return ;
-
         Deadline deadline = new Deadline(secondsPermissionTimeout, TimeUnit.SECONDS);
         camera = cameraManager.requestPermissionAndOpenCamera(deadline, cameraName, null);
-
         if(camera == null) {
             telemetry.addData("ERROR", "Camera not found or permission not granted");
             telemetry.update();
         }
     }
-
     private void startCamera() {
         if(cameraCaptureSession != null) return ;
-
         final int imageFormat = ImageFormat.YUY2;
-
         CameraCharacteristics camCharacteristics = cameraName.getCameraCharacteristics();
         if(!contains(camCharacteristics.getAndroidFormats(), imageFormat)) {
             telemetry.addData("ERROR: ", "image format not supported");
             telemetry.update();
         }
-
         final Size size = camCharacteristics.getDefaultSize(imageFormat);
         final int fps = camCharacteristics.getMaxFramesPerSecond(imageFormat, size);
-
         final ContinuationSynchronizer<CameraCaptureSession> synchronizer = new ContinuationSynchronizer<>();
-
         try {
             camera.createCaptureSession(Continuation.create(callbackHandler, new CameraCaptureSession.StateCallbackDefault() {
                 @Override public void onConfigured(@NonNull CameraCaptureSession session) {
@@ -187,7 +209,6 @@ public class QR_Nav extends LinearOpMode {
                         RobotLog.ee("QR Test", e, "exception starting capture");
                         telemetry.addData("ERROR: ", "exception starting capture");
                         telemetry.update();
-
                         session.close();
                         synchronizer.finish(null);
                     }
@@ -196,16 +217,13 @@ public class QR_Nav extends LinearOpMode {
         } catch (CameraException|RuntimeException e) {
             synchronizer.finish(null);
         }
-
         try {
             synchronizer.await();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-
         cameraCaptureSession = synchronizer.getValue();
     }
-
     private void stopCamera() {
         if(cameraCaptureSession != null) {
             cameraCaptureSession.stopCapture();
@@ -213,32 +231,41 @@ public class QR_Nav extends LinearOpMode {
             cameraCaptureSession = null;
         }
     }
-
     private void closeCamera() {
         stopCamera();
-
         if(camera != null) {
             camera.close();
             camera = null;
         }
     }
-
     // -------------------
     //       Utils
     // -------------------
     public String readQRCode(Bitmap bitmap) {
         String decoded = null;
-
         int[] pixelsArray = new int[bitmap.getWidth() * bitmap.getHeight()];
         bitmap.getPixels(pixelsArray, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-
         LuminanceSource source = new RGBLuminanceSource(bitmap.getWidth(), bitmap.getHeight(), pixelsArray);
         BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
-
         Reader reader = new QRCodeReader();
         try {
             Result result = reader.decode(binaryBitmap);
             decoded = result.getText();
+
+            ResultPoint[] resultPoints = result.getResultPoints();
+
+            // decoded = String.format("X: %f, Y: %f", resultPoints[0].getX(), resultPoints[0].getY());
+
+            telemetry.addData("Nr.", resultPoints.length);
+
+            for(int i = 0; i < resultPoints.length; i++)
+            {
+                String formatted = String.format("X: %f, Y: %f", resultPoints[i].getX(), resultPoints[i].getY());
+                telemetry.addData(String.format("Point #%d", i), formatted);
+
+                telemetry.update();
+            }
+
         } catch (NotFoundException e) {
             e.printStackTrace();
         } catch (ChecksumException e) {
@@ -246,15 +273,12 @@ public class QR_Nav extends LinearOpMode {
         } catch (FormatException e) {
             e.printStackTrace();
         }
-
         return decoded;
     }
-
     private boolean contains(int[] array, int value) {
         for(int i : array) {
             if (i == value) return true;
         }
-
         return false;
     }
 }
