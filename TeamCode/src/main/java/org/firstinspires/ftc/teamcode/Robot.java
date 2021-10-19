@@ -58,7 +58,16 @@ public class Robot {
     }
 
     public void sbin(){
-        sbinPahar.setPower(1);
+        double speed = 0.1;
+        try {
+            for (int i = 1; i <= 5; i++) {
+                sbinPahar.setPower(speed);
+                Thread.sleep(1000);
+                speed *= i;
+            }
+        } catch(Exception e){
+            
+        }
     }
 
     public void toggleTurbo() { _turbo = !_turbo; }
