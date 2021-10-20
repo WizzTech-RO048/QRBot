@@ -66,6 +66,7 @@ public class QR_Nav extends LinearOpMode {
     private EvictingBlockingQueue<Bitmap> frameQueue;
 
     private Handler callbackHandler;
+    private FuckingViewPort webcamViewport;
 
     private Robot robot;
     private Servo gripper;
@@ -100,6 +101,10 @@ public class QR_Nav extends LinearOpMode {
                 return ;
             }
             waitForStart();
+            
+            int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+            webcamViewport = new FuckingViewPort(cameraMonitorViewId);
+
             telemetry.clear();
             telemetry.addData("> ", "Started");
             telemetry.update();
@@ -111,6 +116,7 @@ public class QR_Nav extends LinearOpMode {
                 Bitmap bmp = frameQueue.poll();
 
                 if(bmp != null) {
+                    webcamViewport.draw(bmp);
                     onNewFrame(bmp);
                 }
                 telemetry.update();
@@ -262,20 +268,7 @@ public class QR_Nav extends LinearOpMode {
             Result result = reader.decode(binaryBitmap);
             decoded = result.getText();
 
-            ResultPoint[] resultPoints = result.getResultPoints();
-
-            // decoded = String.format("X: %f, Y: %f", resultPoints[0].getX(), resultPoints[0].getY());
-
-            telemetry.addData("Nr.", resultPoints.length);
-
-            for(int i = 0; i < resultPoints.length; i++)
-            {
-                String formatted = String.format("X: %f, Y: %f", resultPoints[i].getX(), resultPoints[i].getY());
-                telemetry.addData(String.format("Point #%d", i), formatted);
-
-                telemetry.update();
-            }
-
+            // ResultPoint[] resultPoints = result.getResultPoints();
         } catch (NotFoundException e) {
             e.printStackTrace();
         } catch (ChecksumException e) {
@@ -283,6 +276,7 @@ public class QR_Nav extends LinearOpMode {
         } catch (FormatException e) {
             e.printStackTrace();
         }
+        
         return decoded;
     }
     private boolean contains(int[] array, int value) {
