@@ -9,6 +9,8 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl;
@@ -16,7 +18,7 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 
 import java.io.OutputStream;
 
-public class FuckingViewPort {
+public class FuckingViewPort{
     private LinearLayout viewportContainerLayout;
     private SurfaceView view;
 

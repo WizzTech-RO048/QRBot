@@ -1,5 +1,5 @@
 // code written by Vlad Tomici
-
+/**
 package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Bitmap;
@@ -90,7 +90,7 @@ public class OpencvQR extends LinearOpMode {
         final ContinuationSynchronizer<CameraCaptureSession> synchronizer = new ContinuationSynchronizer<>();
 
         try{
-            camera.create
+
         }
     }
 
@@ -124,3 +124,4 @@ public class OpencvQR extends LinearOpMode {
     }
 
 }
+**/

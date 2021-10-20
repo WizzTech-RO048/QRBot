@@ -62,6 +62,7 @@ public class QR_Nav extends LinearOpMode {
     private CameraManager cameraManager;
     private WebcamName cameraName;
     private Camera camera;
+
     private CameraCaptureSession cameraCaptureSession;
     private EvictingBlockingQueue<Bitmap> frameQueue;
 
