@@ -158,7 +158,7 @@ public class QR_Nav extends LinearOpMode {
 
                 case "2":
                     try {
-                        robot.turn(180);
+                        robot.turn(270);
 
 
                         Thread.sleep(2000);
