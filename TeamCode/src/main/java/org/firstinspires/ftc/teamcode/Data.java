@@ -16,7 +16,7 @@ public class Data extends OpMode{
     public void loop(){
         controller.update();
 
-        telemetry.clear()
+        telemetry.clear();
         telemetry.addData("x: ", controller.leftStickX);
         telemetry.addData("y: ", controller.leftStickY);
         telemetry.update();
