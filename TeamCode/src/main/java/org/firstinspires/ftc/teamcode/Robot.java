@@ -101,6 +101,7 @@ public class Robot {
                 } catch(Exception e){ }
                 break;
 
+                /**
             case "2":
                 // rotate to a specific angle
                 try{
@@ -124,6 +125,7 @@ public class Robot {
 
             case "5":
                 // sbinalla
+                 **/
         }
     }
 
