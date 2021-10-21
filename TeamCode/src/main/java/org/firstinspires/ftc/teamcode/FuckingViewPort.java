@@ -64,9 +64,9 @@ public class FuckingViewPort{
 
                     Paint paint = new Paint();
 
-                    canvas.drawBitmap(currentBitmap, 0, 0, paint);
+                    canvas.drawBitmap(newBitmap, 0, 0, paint);
 
-                    currentBitmap.recycle();
+                    newBitmap.recycle();
                 }
             }
             
