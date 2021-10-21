@@ -7,7 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Controller {
     private Gamepad gamepad;
 
-    private x, y, a, b;
+    private int x, y, a, b;
 
     public double leftStickX, leftStickY;
     public double rightStickX, rightStickY;
