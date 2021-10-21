@@ -60,6 +60,8 @@ public class FuckingViewPort{
             {
                 if(currentBitmap != null)
                 {
+                    Bitmap newBitmap = currentBitmap.copy(currentBitmap.getConfig(), true);
+
                     Paint paint = new Paint();
 
                     canvas.drawBitmap(currentBitmap, 0, 0, paint);
