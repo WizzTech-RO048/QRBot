@@ -243,7 +243,7 @@ public class QR_Nav extends LinearOpMode {
         cameraCaptureSession = synchronizer.getValue();
     }
     private void stopCamera() {
-        if(cameraCaptureSession != null && !cameraCaptureSession.isRecycled()) {
+        if(cameraCaptureSession != null) {
             cameraCaptureSession.stopCapture();
             cameraCaptureSession.close();
             cameraCaptureSession = null;
