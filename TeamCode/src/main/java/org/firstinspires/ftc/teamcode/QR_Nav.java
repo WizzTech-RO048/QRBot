@@ -141,8 +141,6 @@ public class QR_Nav extends LinearOpMode {
         }
     }
 
-
-
     // -------------------
     //    Camera logic
     // -------------------
