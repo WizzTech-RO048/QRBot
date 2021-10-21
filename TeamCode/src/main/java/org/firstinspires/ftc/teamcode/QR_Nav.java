@@ -136,8 +136,10 @@ public class QR_Nav extends LinearOpMode {
         if(instruction != null) {
             telemetry.addData("Instruction", instruction);
             telemetry.addData("Turbo", robot.isTurbo());
-
             telemetry.update();
+
+            robot.movingRobot(instruction);
+            robot.stop();
         }
     }
 
