@@ -116,8 +116,9 @@ public class QR_Nav extends LinearOpMode {
 
                 Bitmap bmp = frameQueue.poll();
 
-                if(bmp != null) {
-                    webcamViewport.draw( bmp);
+                if(bmp != null && !bmp.isRecycled()) {
+                    webcamViewport.draw(bmp);
+                    bmp.recycle();
                     onNewFrame(bmp);
                 }
                 telemetry.update();
@@ -242,7 +243,7 @@ public class QR_Nav extends LinearOpMode {
         cameraCaptureSession = synchronizer.getValue();
     }
     private void stopCamera() {
-        if(cameraCaptureSession != null) {
+        if(cameraCaptureSession != null && !cameraCaptureSession.isRecycled()) {
             cameraCaptureSession.stopCapture();
             cameraCaptureSession.close();
             cameraCaptureSession = null;
