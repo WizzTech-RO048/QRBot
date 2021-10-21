@@ -138,28 +138,21 @@ public class QR_Nav extends LinearOpMode {
             telemetry.addData("Turbo", robot.isTurbo());
             telemetry.update();
 
-            if (instruction == "2") {
-                try{
-                    final double x = 0;
-                    final double y = 0.5;
+            final double x = 0.0;
+            final double y = 0.0;
+            final double rotationValue = 0.0;
 
-                    final double rotationValue = 0;
-
-                    final double rotation = Math.pow(rotationValue, 3.0);
-                    final double direction = Math.atan2(x, y) - robot.getHeadingDegrees();
-                    final double speed = Math.min(1.0, Math.sqrt(x * x + y * y)); // reading from the controller values
-
-                    final double lf = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
-                    final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
-                    final double rf = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
-                    final double rr = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
-
-                    robot.setMotors(lf, lr, rf, rr, robot.isTurbo());
-                    Thread.sleep(2000);
-
-                } catch(Exception e){ }
+            switch (instruction){
+                // in current circumstances, we are going to use case "2" as "forward" and case "1" as "backward"
+                case "1": x = 0.0; y = -1.0; rotationValue = 0.0; break;  // forward
+                case "2": x = 0.0; y = 1.0; rotationValue = 0.0; break; // backward;
+                case "3": x = 1.0; y = 0.0; rotationValue = 0.0; break;  // right
+                case "4": x = -1.0; y = 0.0; rotationValue = 0.0; break; // left
+                case "5": x = 0.0; y = 0.0; rotationValue = 1.0; break;  // turn right
+                case "6": x = 0.0; y = 0.0; rotationValue = -1.0; break; // turn left
             }
 
+            robot.movingRobot(x, y, rotationValue);
             robot.stop();
         }
     }
