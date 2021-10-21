@@ -81,6 +81,8 @@ public class QR_Nav extends LinearOpMode {
         cameraName = hardwareMap.get(WebcamName.class, "Webcam");
 
         robot = new Robot(hardwareMap);
+        robot.runUsingEncoders();
+
         gripper = hardwareMap.servo.get("gripper");
 
         gripper.setPosition(0.5);
@@ -126,6 +128,8 @@ public class QR_Nav extends LinearOpMode {
             closeCamera();
         }
     }
+
+    // here is the instruction from the qr code
     private void onNewFrame(Bitmap frame) {
         String instruction = readQRCode(frame);
 
@@ -134,41 +138,11 @@ public class QR_Nav extends LinearOpMode {
             telemetry.addData("Turbo", robot.isTurbo());
 
             telemetry.update();
-
-            switch(instruction) {
-                case "5" :
-                    try{
-                        robot.sbin();
-
-                        Thread.sleep(3000);
-                        robot.stop();
-
-                    } catch (Exception e) {}
-
-                    break;
-                case "4" :
-                    try {
-                        robot.moveForward();
-
-                        Thread.sleep(1000);
-                        robot.stop();
-                    } catch (Exception e) {}
-
-                    break;
-
-                case "2":
-                    try {
-                        robot.turn(10);
-
-
-                        Thread.sleep(2600);
-                        robot.stop();
-                    } catch (Exception e) {}
-
-                    break;
-            }
+            robot.movingRobot(instruction);
         }
     }
+
+
 
     // -------------------
     //    Camera logic
