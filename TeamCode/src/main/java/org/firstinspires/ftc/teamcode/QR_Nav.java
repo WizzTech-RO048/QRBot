@@ -158,10 +158,10 @@ public class QR_Nav extends LinearOpMode {
 
                 case "2":
                     try {
-                        robot.turn(270);
+                        robot.turn(10);
 
 
-                        Thread.sleep(2000);
+                        Thread.sleep(2200);
                         robot.stop();
                     } catch (Exception e) {}
 
