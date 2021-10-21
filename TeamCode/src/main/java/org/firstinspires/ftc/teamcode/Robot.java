@@ -169,7 +169,7 @@ public class Robot {
     public void TURBO() { _turbo = true; }
     public boolean isTurbo() { return _turbo; }
 
-    private void setMotors(double _lf, double _lr, double _rf, double _rr, boolean nitro) {
+    public void setMotors(double _lf, double _lr, double _rf, double _rr, boolean nitro) {
         final double precentage = nitro ? 1 : 0.35;
 
         if(_lf > 1.0 || _lr > 1.0 || _rf > 1.0 || _rr > 1.0) return ;
