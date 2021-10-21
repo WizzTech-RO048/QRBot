@@ -67,6 +67,8 @@ public class FuckingViewPort{
                     currentBitmap.recycle();
                 }
             }
+            
+            view.getHolder().unlockCanvasAndPost(canvas);
         }
     }
 }
