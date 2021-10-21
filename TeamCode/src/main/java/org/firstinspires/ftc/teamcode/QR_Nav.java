@@ -116,9 +116,8 @@ public class QR_Nav extends LinearOpMode {
 
                 Bitmap bmp = frameQueue.poll();
 
-                if(bmp != null && !bmp.isRecycled()) {
+                if(bmp != null) {
                     webcamViewport.draw(bmp);
-                    bmp.recycle();
                     onNewFrame(bmp);
                 }
                 telemetry.update();
