@@ -77,30 +77,27 @@ public class Robot {
     }
 
     public void movingRobot(String instruction){
-        switch(instruction){
-            case "2":
-                // move to a specific direction
-                try{
-                    final double x = 0;
-                    final double y = 0.5;
+        if (instruction == "2") {
+            try{
+                final double x = 0;
+                final double y = 0.5;
 
-                    final double rotationValue = 0;
+                final double rotationValue = 0;
 
-                    final double rotation = Math.pow(rotationValue, 3.0);
-                    final double direction = Math.atan2(x, y) - getHeadingDegrees();
-                    final double speed = Math.min(1.0, Math.sqrt(x * x + y * y)); // reading from the controller values
+                final double rotation = Math.pow(rotationValue, 3.0);
+                final double direction = Math.atan2(x, y) - getHeadingDegrees();
+                final double speed = Math.min(1.0, Math.sqrt(x * x + y * y)); // reading from the controller values
 
-                    final double lf = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
-                    final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
-                    final double rf = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
-                    final double rr = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
+                final double lf = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
+                final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
+                final double rf = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
+                final double rr = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
 
-                    setMotors(lf, lr, rf, rr, _turbo);
-                    Thread.sleep(2000);
+                setMotors(lf, lr, rf, rr, _turbo);
+                Thread.sleep(2000);
 
-                } catch(Exception e){ }
-                break;
-
+            } catch(Exception e){ }
+        }
                 /**
             case "2":
                 // rotate to a specific angle
@@ -126,7 +123,7 @@ public class Robot {
             case "5":
                 // sbinalla
                  **/
-        }
+
     }
 
     public void moveForward() {
