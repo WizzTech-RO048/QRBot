@@ -75,7 +75,7 @@ public class Robot {
             motor.setMode(mode);
         }
     }
-
+/**
     public void movingRobot(String instruction){
         switch(instruction){
             case "1":
@@ -85,17 +85,19 @@ public class Robot {
                     final double y = ;
 
                     final double rotationValue = ;
+                    final double rotationX = ;
+                    final double rotationY = ;
 
                     final double rotation = Math.pow(rotationValue, 3.0);
-                    final double direction = Math.atan(x, y) - getHeadingDegrees();
-                    final double speed = ;
+                    final double direction = Math.atan(rotationX, rotationY) - getHeadingDegrees();
+                    final double speed = ; // reading from the controller values
 
-                    final double lf = ;
-                    final double lr = ;
-                    final double rf = ;
-                    final double rr = ;
+                    final double lf = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
+                    final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
+                    final double rf = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
+                    final double rr = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
 
-                    setMotors(lf, lr, rf, rr, _turbo);
+                    // setMotors(lf, lr, rf, rr, _turbo);
 
                 } catch(Exception e){ }
                 break;
@@ -125,7 +127,7 @@ public class Robot {
                 // sbinalla
         }
     }
-
+*/
     public void moveForward() {
         setMotors(-1, -1, -1, -1, _turbo);
     }
