@@ -110,7 +110,7 @@ public class QR_Nav extends LinearOpMode {
             telemetry.addData("> ", "Started");
             telemetry.update();
 
-            while(opModeIsActive()) {
+            while(true && opModeIsActive()) {
                 if(gamepad1.a) gripper.setPosition(0.7);
                 if(gamepad1.b) gripper.setPosition(0.3);
 
