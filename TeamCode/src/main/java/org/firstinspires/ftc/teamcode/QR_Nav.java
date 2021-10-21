@@ -146,7 +146,7 @@ public class QR_Nav extends LinearOpMode {
                     } catch (Exception e) {}
 
                     break;
-                case "2" :
+                case "4" :
                     try {
                         robot.moveForward();
 
@@ -156,7 +156,7 @@ public class QR_Nav extends LinearOpMode {
 
                     break;
 
-                case "4":
+                case "2":
                     try {
                         robot.turn(10);
 
