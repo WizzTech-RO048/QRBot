@@ -5,10 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name = "Data")
 public class Data extends OpMode{
+    private Robot robot;
     private Controller controller;
 
     @Override
     public void init(){
+        robot = new Robot(hardwareMap);
         controller = new Controller(gamepad1);
 
     }

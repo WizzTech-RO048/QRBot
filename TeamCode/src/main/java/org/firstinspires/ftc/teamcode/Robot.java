@@ -76,6 +76,7 @@ public class Robot {
         }
     }
 
+
     public void movingRobot(double x, double y, double rotationValue){
         try{
             final double speed = Math.min(1.0, Math.sqrt(x * x + y * y)); // reading from the controller values
@@ -135,16 +136,24 @@ public class Robot {
     public void TURBO() { _turbo = true; }
     public boolean isTurbo() { return _turbo; }
 
+    private static double maxAbs(double ... xs){
+        double ret = Double.MIN_VALUE;
+        for(double x : xs){
+            if(Math.abs(x) > ret){
+                ret = Math.abs(x);
+            }
+        }
+        return ret;
+    }
+
     public void setMotors(double _lf, double _lr, double _rf, double _rr, boolean nitro) {
-        final double precentage = nitro ? 1 : 0.35;
+        final double divider = (nitro ? 1.0 : 7.5);
+        final double scale = maxAbs(1.0, _lf, _lr, _rf, _rr);
 
-        if(_lf > 1.0 || _lr > 1.0 || _rf > 1.0 || _rr > 1.0) return ;
-        if(_lf < -1.0 || _lr < -1.0 || _rf < -1.0 || _rr < -1.0) return ;
-
-        leftFront.setPower(_lf * precentage);
-        leftRear.setPower(_lr * precentage);
-        rightFront.setPower(_rf * precentage);
-        rightRear.setPower(_rr * precentage);
+        leftFront.setPower(_lf / scale / divider);
+        leftRear.setPower(_lr / scale / divider);
+        rightFront.setPower(_rf / scale / divider);
+        rightRear.setPower(_rr / scale / divider);
     }
 
 }
