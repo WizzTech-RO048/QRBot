@@ -138,9 +138,9 @@ public class QR_Nav extends LinearOpMode {
             telemetry.addData("Turbo", robot.isTurbo());
             telemetry.update();
 
-            final double x = 0.0;
-            final double y = 0.0;
-            final double rotationValue = 0.0;
+            double x = 0;
+            double y = 0;
+            double rotationValue = 0;
 
             switch (instruction){
                 // in current circumstances, we are going to use case "2" as "forward" and case "1" as "backward"
