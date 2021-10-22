@@ -96,7 +96,6 @@ public class Robot {
     public void moveForward() {
         setMotors(-1, -1, -1, -1, _turbo);
     }
-
     public void stop() {
         setMotors(0, 0, 0, 0, _turbo);
     }
