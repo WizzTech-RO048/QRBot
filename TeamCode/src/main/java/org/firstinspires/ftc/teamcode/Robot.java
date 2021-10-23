@@ -81,8 +81,8 @@ public class Robot {
     }
 
     public void movingRobot(double x1, double y1, double degrees, double speedPercentage){
-        final double x = Math.pow(x1 * speedPercentage / 100, 3.0);
-        final double y = Math.pow(y1 * speedPercentage / 100, 3.0);
+        final double x = Math.pow(x1, 3.0);
+        final double y = Math.pow(y1, 3.0);
         final double rotationValue = 0.5;
 
         final double rotation = Math.pow(rotationValue, 3.0);
