@@ -143,32 +143,15 @@ public class QR_Nav extends LinearOpMode {
 
             switch (instruction){
                 // in current circumstances, we are going to use case "2" as "forward" and case "1" as "backward"
-                case "2": // backward
-                    x = 0.0; y = -1.0; rotationValue = 0.0;
-                    try{
-                        final double speed = Math.min(1.0, Math.sqrt(x * x + y * y)); // reading from the controller values
-                        final double rotation = Math.pow(rotationValue, 3.0);
-                        final double direction = Math.atan2(x, y) - robot.getHeadingDegrees();
-
-                        final double lf = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
-                        final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
-                        final double rf = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
-                        final double rr = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
-
-                        robot.setMotors(lf, lr, rf, rr, robot.isTurbo());
-                        Thread.sleep(2000);
-                    } catch(Exception e) { }
-                    break;
-
-                case "5":
-                    try{
-                        gripper.setPosition(1.0);
-                        Thread.sleep(1000);
-                        gripper.setPosition(0.0);
-                    } catch(Exception e){ }
+                case "1": x = 0.0; y = -1.0; rotationValue = 0.0; break; // move backward
+                case "2": x = 0.0; y = 1.0; rotationValue = 0.0; break;  // move forward
+                case "3": x = 1.0; y = 0.0; rotationValue = 0.0; break;  // move right
+                case "4": x = -1.0; y = 0.0; rotationValue = 0.0; break; // move left
+                case "5": x = 0.0; y = 0.0; rotationValue = 1.0; break;  // rotate right
+                case "6": x = 0.0; y = 0.0; rotationValue = -1.0; break; // rotate left
             }
 
-            robot.stop();
+            robot.movingRobot(x, y, rotationValue);
         }
     }
 
