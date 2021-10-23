@@ -76,39 +76,32 @@ public class Robot {
         }
     }
 
+    public void movingRobot(double x1, double y1, double rotationValue){
+        final double x = Math.pow(x1, 3.0);
+        final double y = Math.pow(y1, 3.0);
 
-    public void movingRobot(double x, double y, double rotationValue){
-        try{
-            final double speed = Math.min(1.0, Math.sqrt(x * x + y * y)); // reading from the controller values
-            final double rotation = Math.pow(rotationValue, 3.0);
-            final double direction = Math.atan2(x, y) - getHeadingDegrees();
+        final double speed = Math.min(1.0, Math.sqrt(x * x + y * y)); // reading from the controller values
+        final double rotation = Math.pow(rotationValue, 3.0);
+        final double direction = Math.atan2(x, y) - getHeadingDegrees();
 
-            final double lf = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
-            final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
-            final double rf = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
-            final double rr = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
+        final double lf = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
+        final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
+        final double rf = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
+        final double rr = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
 
-            setMotors(lf, lr, rf, rr, isTurbo());
-            Thread.sleep(2000);
-        } catch(Exception e) { }
+        setMotors(lf, lr, rf, rr, isTurbo());
     }
 
-    public void moveForward() {
-        setMotors(-1, -1, -1, -1, _turbo);
-    }
-    public void stop() {
-        setMotors(0, 0, 0, 0, _turbo);
-    }
-
-    public void turn(double degrees) {
-        setMotors(-1, -1, 1, 1, _turbo);
-
-//        try {
-//            Thread.sleep(1000);
-//        } catch (Exception e) { e.printStackTrace(); }
-//
-//        stop();
-    }
+    // public void moveForward() { setMotors(-1, -1, -1, -1, _turbo); }
+    // public void stop() { setMotors(0, 0, 0, 0, _turbo); }
+    // public void turn(double degrees) {
+    //     setMotors(-1, -1, 1, 1, _turbo);
+    //     try {
+    //         Thread.sleep(1000);
+    //     } catch (Exception e) { e.printStackTrace(); }
+    //
+    //     stop();
+    // }
 
     public void moveTo(double speed, double direction) {
 
@@ -127,7 +120,7 @@ public class Robot {
             Thread.sleep(3000);
             sbinPahar.setPower(0);
         } catch(Exception e){
-            
+
         }
     }
 
