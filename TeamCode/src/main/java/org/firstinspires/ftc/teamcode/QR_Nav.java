@@ -160,7 +160,7 @@ public class QR_Nav extends LinearOpMode {
                     } catch(Exception e) { }
                     break;
 
-                case "3":
+                case "5":
                     try{
                         gripper.setPosition(1.0);
                         Thread.sleep(1000);
