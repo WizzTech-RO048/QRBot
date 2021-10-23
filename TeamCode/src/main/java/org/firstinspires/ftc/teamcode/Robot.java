@@ -18,8 +18,6 @@ public class Robot {
 
     private boolean _turbo;
 
-    private final BNO055IMU imu;
-
     private double headingOffset = 0.0;
     private Orientation angles;
     private Acceleration gravity;
@@ -37,13 +35,6 @@ public class Robot {
         rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
         rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-
-
         _turbo = true;
     }
 
@@ -52,7 +43,6 @@ public class Robot {
     // -------------------
     public void runUsingEncoders(){ setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER, leftFront, leftRear, rightFront, rightRear); }
     public void runWithoutEncoders(){ setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER, leftFront, leftRear, rightFront, rightRear); }
-    public boolean isGyroCalibrated() { return imu.isGyroCalibrated(); }
 
     // -------------------
     // - Heading functions
@@ -61,11 +51,6 @@ public class Robot {
     public double getHeading() { return (getRawHeading() - headingOffset) % (2.0 * Math.PI); }
     public double getHeadingDegrees() { return Math.toDegrees(getHeading()); }
     public void resetHeading() { headingOffset = getRawHeading(); }
-
-    public void loop(){
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
-        gravity = imu.getGravity();
-    }
 
     // -------------------
     // - Motors functions
