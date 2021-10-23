@@ -65,9 +65,8 @@ public class Robot {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
         gravity = imu.getGravity();
     }
-    public boolean isGyroCalibrated(){ return imu.isGyroCalibrated(); }
     private double getRawHeading(){ return angles.firstAngle; }
-    public double getHeading(){ return (getRawHeading() - headingOffset) % (2.0 * Math.PI); }
+    public double getHeading(){ return (angles.firstAngle - headingOffset) % (2.0 * Math.PI); }
     public double getHeadingDegrees(){ return Math.toDegrees(getHeading()); }
     public void resetHeading(){ headingOffset = getRawHeading(); }
 

@@ -132,9 +132,12 @@ public class QR_Nav extends LinearOpMode {
     private void onNewFrame(Bitmap frame) {
         String instruction = readQRCode(frame);
 
+        robot.headingLoop();
+
         if(instruction != null) {
             telemetry.addData("Instruction", instruction);
             telemetry.addData("Turbo", robot.isTurbo());
+            telemetry.addData("heading:", robot.getHeading());
             telemetry.update();
 
             double x = 0;
