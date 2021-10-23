@@ -41,6 +41,8 @@ public class Robot {
     // - Heading functions
     // -------------------
 
+
+
     // -------------------
     // - Motors functions
     // -------------------
@@ -50,9 +52,10 @@ public class Robot {
         }
     }
 
-    public void movingRobot(double x1, double y1, double rotationValue){
-        final double x = Math.pow(x1, 3.0);
-        final double y = Math.pow(y1, 3.0);
+    public void movingRobot(double x1, double y1, double degrees, double speedPercentage){
+        final double x = Math.pow(x1 * speedPercentage / 100, 3.0);
+        final double y = Math.pow(y1 * speedPercentage / 100, 3.0);
+        final double rotationValue = degrees / 90;
 
         final double speed = Math.min(1.0, Math.sqrt(x * x + y * y)); // reading from the controller values
         final double rotation = Math.pow(rotationValue, 3.0);
@@ -66,8 +69,8 @@ public class Robot {
         setMotors(lf, lr, rf, rr, isTurbo());
     }
 
+    public void stop() { setMotors(0, 0, 0, 0, _turbo); }
     // public void moveForward() { setMotors(-1, -1, -1, -1, _turbo); }
-    // public void stop() { setMotors(0, 0, 0, 0, _turbo); }
     // public void turn(double degrees) {
     //     setMotors(-1, -1, 1, 1, _turbo);
     //     try {

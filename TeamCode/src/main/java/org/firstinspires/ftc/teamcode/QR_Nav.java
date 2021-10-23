@@ -139,19 +139,23 @@ public class QR_Nav extends LinearOpMode {
 
             double x = 0;
             double y = 0;
-            double rotationValue = 0;
+            double degree = 0;
 
             switch (instruction){
                 // in current circumstances, we are going to use case "2" as "forward" and case "1" as "backward"
-                case "1": x = 0.0; y = -1.0; rotationValue = 0.0; break; // move backward
-                case "2": x = 0.0; y = 1.0; rotationValue = 0.0; break;  // move forward
-                case "3": x = 1.0; y = 0.0; rotationValue = 0.0; break;  // move right
-                case "4": x = -1.0; y = 0.0; rotationValue = 0.0; break; // move left
-                case "5": x = 0.0; y = 0.0; rotationValue = 1.0; break;  // rotate right
-                case "6": x = 0.0; y = 0.0; rotationValue = -1.0; break; // rotate left
+                case "1": x = 0.0; y = -1.0; degree = 0.0; break; // move backward
+                case "2": x = 0.0; y = 1.0; degree = 0.0; break;  // move forward
+                case "3": x = 1.0; y = 0.0; degree = 0.0; break;  // move right
+                case "4": x = -1.0; y = 0.0; degree = 0.0; break; // move left
+                case "5": x = 0.0; y = 0.0; degree = 1.0; break;  // rotate right
+                case "6": x = 0.0; y = 0.0; degree = -1.0; break; // rotate left
             }
 
-            robot.movingRobot(x, y, rotationValue);
+            try{
+                robot.movingRobot(x, y, degree, 50);
+                Thread.sleep(2000);
+                robot.stop();
+            } catch(Exception e){ }
         }
     }
 
