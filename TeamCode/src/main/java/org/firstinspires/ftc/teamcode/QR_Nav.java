@@ -155,11 +155,7 @@ public class QR_Nav extends LinearOpMode {
                 case "7": robot.resetHeading(); break;
             }
 
-            try{
-                robot.movingRobot(x, y, degree, 100);
-                Thread.sleep(2000);
-                robot.stop();
-            } catch(Exception e){ }
+            robot.movingRobot(x, y, degree, 100);
         }
     }
 
