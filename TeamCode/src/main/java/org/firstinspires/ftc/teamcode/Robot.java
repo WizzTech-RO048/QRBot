@@ -1,8 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -13,7 +20,11 @@ public class Robot {
 
     private boolean _turbo;
 
+    private final BNO055IMU imu;
+
     private double headingOffset = 0.0;
+    private Orientation angles;
+    private Acceleration gravity;
 
     public Robot(final HardwareMap hardwareMap) {
         leftFront = hardwareMap.dcMotor.get("lf");
@@ -28,6 +39,16 @@ public class Robot {
         rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
         rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
 
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        imu.initialize(parameters);
+
         _turbo = true;
     }
 
@@ -40,8 +61,15 @@ public class Robot {
     // -------------------
     // - Heading functions
     // -------------------
-
-
+    public void headingLoop(){
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
+        gravity = imu.getGravity();
+    }
+    public boolean isGyroCalibrated(){ return imu.isGyroCalibrated(); }
+    private double getRawHeading(){ return angles.firstAngle; }
+    public double getHeading(){ return (getRawHeading() - headingOffset) % (2.0 * Math.PI); }
+    public double getHeadingDegrees(){ return Math.toDegrees(getHeading()); }
+    public void resetHeading(){ headingOffset = getRawHeading(); }
 
     // -------------------
     // - Motors functions
@@ -59,7 +87,7 @@ public class Robot {
 
         final double speed = Math.min(1.0, Math.sqrt(x * x + y * y)); // reading from the controller values
         final double rotation = Math.pow(rotationValue, 3.0);
-        final double direction = Math.atan2(x, y);
+        final double direction = Math.atan2(x, y) - getHeading();
 
         final double lf = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
         final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;

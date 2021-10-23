@@ -149,6 +149,7 @@ public class QR_Nav extends LinearOpMode {
                 case "4": x = -1.0; y = 0.0; degree = 0.0; break; // move left
                 case "5": x = 0.0; y = 0.0; degree = 45; break;  // rotate right
                 case "6": x = 0.0; y = 0.0; degree = -1.0; break; // rotate left
+                case "7": robot.resetHeading(); break;
             }
 
             try{
