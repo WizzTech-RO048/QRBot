@@ -143,11 +143,11 @@ public class QR_Nav extends LinearOpMode {
 
             switch (instruction){
                 // in current circumstances, we are going to use case "2" as "forward" and case "1" as "backward"
-                case "1": x = 0.0; y = -1.0; degree = 0.0; break; // move backward
-                case "2": x = 0.0; y = 1.0; degree = 0.0; break;  // move forward
+                case "1": x = 0.0; y = 1.0; degree = 0.0; break; // move backward
+                case "2": x = 0.0; y = -1.0; degree = 0.0; break;  // move forward
                 case "3": x = 1.0; y = 0.0; degree = 0.0; break;  // move right
                 case "4": x = -1.0; y = 0.0; degree = 0.0; break; // move left
-                case "5": x = 0.0; y = 0.0; degree = 1.0; break;  // rotate right
+                case "5": x = 0.0; y = 0.0; degree = 45; break;  // rotate right
                 case "6": x = 0.0; y = 0.0; degree = -1.0; break; // rotate left
             }
 
