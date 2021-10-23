@@ -103,7 +103,7 @@ public class QR_Nav extends LinearOpMode {
                 return ;
             }
             waitForStart();
-            
+
             int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             webcamViewport = new FuckingViewPort(cameraMonitorViewId);
 
@@ -279,7 +279,7 @@ public class QR_Nav extends LinearOpMode {
         } catch (FormatException e) {
             e.printStackTrace();
         }
-        
+
         return decoded;
     }
     private boolean contains(int[] array, int value) {

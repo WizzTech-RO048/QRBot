@@ -127,7 +127,7 @@ public class Robot {
             Thread.sleep(3000);
             sbinPahar.setPower(0);
         } catch(Exception e){
-            
+
         }
     }
 
