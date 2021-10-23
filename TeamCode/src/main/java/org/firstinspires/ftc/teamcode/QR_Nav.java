@@ -82,9 +82,9 @@ public class QR_Nav extends LinearOpMode {
 
         robot = new Robot(hardwareMap);
 
-        // gripper = hardwareMap.servo.get("gripper");
-        // gripper.setPosition(0.5);
-        
+        gripper = hardwareMap.servo.get("gripper");
+        gripper.setPosition(0.0);
+
         // cameraName = hardwareMap.get(WebcamName.class, "Webcam");
 
         initFrameQueue(2);
@@ -159,6 +159,13 @@ public class QR_Nav extends LinearOpMode {
                         Thread.sleep(2000);
                     } catch(Exception e) { }
                     break;
+
+                case "3":
+                    try{
+                        gripper.setPosition(1.0);
+                        Thread.sleep(1000);
+                        gripper.setPosition(0.0);
+                    } catch(Exception e){ }
             }
 
             robot.stop();
