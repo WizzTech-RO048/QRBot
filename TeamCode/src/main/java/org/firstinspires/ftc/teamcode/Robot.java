@@ -6,11 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class Robot {
     private DcMotor leftFront, leftRear, rightFront, rightRear;
@@ -19,8 +14,6 @@ public class Robot {
     private boolean _turbo;
 
     private double headingOffset = 0.0;
-    private Orientation angles;
-    private Acceleration gravity;
 
     public Robot(final HardwareMap hardwareMap) {
         leftFront = hardwareMap.dcMotor.get("lf");
@@ -47,10 +40,6 @@ public class Robot {
     // -------------------
     // - Heading functions
     // -------------------
-    public double getRawHeading() { return angles.firstAngle; }
-    public double getHeading() { return (getRawHeading() - headingOffset) % (2.0 * Math.PI); }
-    public double getHeadingDegrees() { return Math.toDegrees(getHeading()); }
-    public void resetHeading() { headingOffset = getRawHeading(); }
 
     // -------------------
     // - Motors functions
@@ -67,7 +56,7 @@ public class Robot {
 
         final double speed = Math.min(1.0, Math.sqrt(x * x + y * y)); // reading from the controller values
         final double rotation = Math.pow(rotationValue, 3.0);
-        final double direction = Math.atan2(x, y) - getHeadingDegrees();
+        final double direction = Math.atan2(x, y);
 
         final double lf = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
         final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
