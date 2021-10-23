@@ -83,11 +83,11 @@ public class Robot {
     public void movingRobot(double x1, double y1, double degrees, double speedPercentage){
         final double x = Math.pow(x1 * speedPercentage / 100, 3.0);
         final double y = Math.pow(y1 * speedPercentage / 100, 3.0);
-        final double rotationValue = degrees / 90;
+        final double rotationValue = 0.5;
 
-        final double speed = Math.min(1.0, Math.sqrt(x * x + y * y)); // reading from the controller values
         final double rotation = Math.pow(rotationValue, 3.0);
         final double direction = Math.atan2(x, y) - getHeading();
+        final double speed = Math.min(1.0, Math.sqrt(x * x + y * y));
 
         final double lf = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
         final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
