@@ -75,6 +75,7 @@ public class Robot {
     // -------------------
     private void setMotorMode(DcMotor.RunMode mode, DcMotor ... motors){
         for(DcMotor motor : motors){
+
             motor.setMode(mode);
         }
     }
@@ -119,6 +120,14 @@ public class Robot {
         final double lr = speedPercentage / 100.0;
         final double rf = speedPercentage / 100.0 * -1.0;
         final double rr = speedPercentage / 100.0 * -1.0;
+        setMotors(lf, lr, rf, rr, isTurbo());
+    }
+
+    public void diagonalMovement(double speedPercentage){
+        final double lf = speedPercentage / 100;
+        final double lr = 0;
+        final double rf = 0;
+        final double rr = speedPercentage / 100;
         setMotors(lf, lr, rf, rr, isTurbo());
     }
 

@@ -41,12 +41,14 @@ public class MainTeleOp extends OpMode {
         controller.update();
         robot.headingLoop();
 
-        double speedPercentage = 50;
+        double speedPercentage = 100;
 
         if(controller.A()){ robot.moveBackward(speedPercentage); }
         if(controller.X()){ robot.moveLeft(speedPercentage); }
         if(controller.Y()){ robot.moveForward(speedPercentage); }
-        if(controller.B()){ robot.moveRight(speedPercentage); }
+        if(controller.B()){ robot.diagonalMovement(speedPercentage); }
+
+        robot.stop();
 
         updateRobot();
     }
