@@ -23,10 +23,16 @@ public class MainTeleOp extends OpMode {
         final double direction = Math.atan2(x, y) - robot.getHeading();
         final double speed = Math.min(1.0, Math.sqrt(x*x + y*y));
 
-        final double lf = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
-        final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
-        final double rf = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
-        final double rr = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
+        final double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(controller.rightStickX), 1);
+        final double lf = (y + x + controller.rightStickX) / denominator;
+        final double lr = (y - x + controller.rightStickX) / denominator;
+        final double rf = (y - x - controller.rightStickX) / denominator;
+        final double rr = (y + x - controller.rightStickX) / denominator;
+
+        // final double lf = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
+        // final double rf = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
+        // final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
+        // final double rr = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
 
         robot.setMotors(lf, lr, rf, rr, robot.isTurbo());
     }
