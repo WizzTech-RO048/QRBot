@@ -79,6 +79,49 @@ public class Robot {
         }
     }
 
+    public void moveForward(double speedPercentage){
+        final double lf = speedPercentage / 100.0;
+        final double lr = speedPercentage / 100.0;
+        final double rf = speedPercentage / 100.0;
+        final double rr = speedPercentage / 100.0;
+        setMotors(lf, lr, rf, rr, isTurbo());
+    }
+    public void moveBackward(double speedPercentage){
+        final double lf = speedPercentage / 100.0 * -1.0;
+        final double lr = speedPercentage / 100.0 * -1.0;
+        final double rf = speedPercentage / 100.0 * -1.0;
+        final double rr = speedPercentage / 100.0 * -1.0;
+        setMotors(lf, lr, rf, rr, isTurbo());
+    }
+    public void moveRight(double speedPercentage){
+        final double lf = speedPercentage / 100.0;
+        final double lr = speedPercentage / 100.0 * -1.0;
+        final double rf = speedPercentage / 100.0 * -1.0;
+        final double rr = speedPercentage / 100.0;
+        setMotors(lf, lr, rf, rr, isTurbo());
+    }
+    public void moveLeft(double speedPercentage){
+        final double lf = speedPercentage / 100.0 * -1.0;
+        final double lr = speedPercentage / 100.0;
+        final double rf = speedPercentage / 100.0;
+        final double rr = speedPercentage / 100.0 * -1.0;
+        setMotors(lf, lr, rf, rr, isTurbo());
+    }
+    public void rotateLeft(double speedPercentage){
+        final double lf = speedPercentage / 100.0 * -1.0;
+        final double lr = speedPercentage / 100.0 * -1.0;
+        final double rf = speedPercentage / 100.0;
+        final double rr = speedPercentage / 100.0;
+        setMotors(lf, lr, rf, rr, isTurbo());
+    }
+    public void rotateRight(double speedPercentage){
+        final double lf = speedPercentage / 100.0;
+        final double lr = speedPercentage / 100.0;
+        final double rf = speedPercentage / 100.0 * -1.0;
+        final double rr = speedPercentage / 100.0 * -1.0;
+        setMotors(lf, lr, rf, rr, isTurbo());
+    }
+
     public void movingRobot(double x1, double y1, double degrees){
         final double x = Math.pow(x1, 3.0);
         final double y = Math.pow(y1, 3.0);

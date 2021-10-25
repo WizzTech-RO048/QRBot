@@ -34,12 +34,19 @@ public class MainTeleOp extends OpMode {
         // final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
         // final double rr = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
 
-        robot.setMotors(lf, lr, rf, rr, robot.isTurbo());
+        // robot.setMotors(lf, lr, rf, rr, robot.isTurbo());
     }
     @Override
     public void loop(){
         controller.update();
         robot.headingLoop();
+
+        double speedPercentage = 50;
+
+        if(controller.A()){ robot.moveBackward(speedPercentage); }
+        if(controller.X()){ robot.moveLeft(speedPercentage); }
+        if(controller.Y()){ robot.moveForward(speedPercentage); }
+        if(controller.B()){ robot.moveRight(speedPercentage); }
 
         updateRobot();
     }
