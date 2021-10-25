@@ -79,7 +79,7 @@ public class Robot {
         }
     }
 
-    public void movingRobot(double x1, double y1, double degrees, double speedPercentage){
+    public void movingRobot(double x1, double y1, double degrees){
         final double x = Math.pow(x1, 3.0);
         final double y = Math.pow(y1, 3.0);
         final double rotationValue = 1.0;
@@ -94,6 +94,13 @@ public class Robot {
         final double rr = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
 
         setMotors(lf, lr, rf, rr, isTurbo());
+    }
+
+    public void robotWait(){
+        try{
+            setMotors(0, 0, 0, 0, isTurbo());
+            Thread.sleep(1000);
+        } catch(Exception e){ }
     }
 
     public void stop() { setMotors(0, 0, 0, 0, _turbo); }

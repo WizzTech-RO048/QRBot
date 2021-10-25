@@ -131,13 +131,14 @@ public class QR_Nav extends LinearOpMode {
     // here is the instruction from the qr code
     private void onNewFrame(Bitmap frame) {
         String instruction = readQRCode(frame);
+        String currentInstruction = null;
 
         robot.headingLoop();
 
         if(instruction != null) {
             telemetry.addData("Instruction", instruction);
             telemetry.addData("Turbo", robot.isTurbo());
-            telemetry.addData("heading:", robot.getHeading());
+            // telemetry.addData("heading:", robot.getHeading());
             telemetry.update();
 
             double x = 0;
@@ -146,17 +147,22 @@ public class QR_Nav extends LinearOpMode {
 
             switch (instruction){
                 // in current circumstances, we are going to use case "2" as "forward" and case "1" as "backward"
-                case "1": x = 0.0; y = 1.0; degree = 0.0; break; // move backward
-                case "2": x = 0.0; y = -1.0; degree = 0.0; break;  // move forward
-                case "3": x = 1.0; y = 0.0; degree = 0.0; break;  // move right
-                case "4": x = -1.0; y = 0.0; degree = 0.0; break; // move left
+                case "1": x = 0.0; y = 0.5; degree = 0.0; break; // move backward
+                case "2": x = 0.0; y = -0.5; degree = 0.0; break;  // move forward
+                case "3": x = 0.5; y = 0.0; degree = 0.0; break;  // move right
+                case "4": x = -0.5; y = 0.0; degree = 0.0; break; // move left
                 case "5": x = 0.0; y = 0.0; degree = 45.0; break;  // rotate right
                 case "6": x = 0.0; y = 0.0; degree = -1.0; break; // rotate left
                 case "7": robot.resetHeading(); break;
             }
 
-            robot.movingRobot(x, y, degree, 100);
+            robot.movingRobot(x, y, degree);
         }
+        if(instruction != currentInstruction){
+            robot.robotWait();
+        }
+
+        currentInstruction = instruction;
     }
 
     // -------------------
@@ -180,7 +186,7 @@ public class QR_Nav extends LinearOpMode {
             telemetry.update();
         }
     }
-    private void startCamera() {
+    private void startCamera() {   
         if(cameraCaptureSession != null) return ;
         final int imageFormat = ImageFormat.YUY2;
         CameraCharacteristics camCharacteristics = cameraName.getCameraCharacteristics();
