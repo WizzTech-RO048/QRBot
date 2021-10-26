@@ -18,5 +18,8 @@ public class MainTeleOp extends OpMode {
         robot.setTurbo(gamepad1.right_trigger == 1);
         robot.move(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
         robot.moveScissorsEngine(gamepad1.right_stick_y);
+        if (gamepad1.y) {
+            robot.sbin();
+        }
     }
 }
