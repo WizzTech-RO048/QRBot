@@ -86,7 +86,10 @@ public class Robot {
         y = y * y * y;
         rotation = rotation * rotation * rotation;
 
-        final double heading = (getAngularOrientation() - headingOffset) % (2.0 * Math.PI);
+        final double orientation = getAngularOrientation();
+        final double heading = (orientation - headingOffset) % (2.0 * Math.PI);
+        headingOffset = orientation;
+
         final double direction = Math.atan2(x, y) - heading;
         final double speed = Math.min(1.0, Math.sqrt(x * x + y * y));
         final double factorSin = speed * Math.sin(direction + Math.PI / 4.0);
