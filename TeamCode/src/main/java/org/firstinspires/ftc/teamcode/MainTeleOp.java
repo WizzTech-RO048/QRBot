@@ -10,11 +10,12 @@ public class MainTeleOp extends OpMode {
 
     @Override
     public void init(){
-        robot = new Robot(hardwareMap);
+        robot = new Robot(hardwareMap, telemetry);
     }
 
     @Override
     public void loop(){
+        robot.setTurbo(gamepad1.right_trigger == 1);
         robot.move(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
     }
 }

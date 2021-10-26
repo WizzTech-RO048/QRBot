@@ -5,6 +5,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -20,7 +21,9 @@ public class Robot {
     private final DcMotor rightRear;
     private final DcMotor sbinPahar;
 
-    private boolean turbo = true;
+    private final Telemetry telemetry;
+
+    private boolean turbo = false;
 
     private final BNO055IMU imu;
 
@@ -28,7 +31,8 @@ public class Robot {
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    public Robot(final HardwareMap hardwareMap) {
+    public Robot(final HardwareMap hardwareMap, final Telemetry t) {
+        telemetry = t;
         leftFront = hardwareMap.dcMotor.get("lf");
         leftRear = hardwareMap.dcMotor.get("lr");
         rightFront = hardwareMap.dcMotor.get("rf");
@@ -86,10 +90,12 @@ public class Robot {
         final double heading = (orientation - headingOffset) % (2.0 * Math.PI);
         headingOffset = orientation;
 
-        final double direction = Math.atan2(x, y) - heading;
+        final double direction = heading - Math.atan2(x, y);
         final double speed = Math.min(1.0, Math.sqrt(x * x + y * y));
         final double factorSin = speed * Math.sin(direction + Math.PI / 4.0);
         final double factorCos = speed * Math.cos(direction + Math.PI / 4.0);
+
+        telemetry.addData("Movement", "X: %f\nY: %f\nRotation: %f\norientation: %f\n", x, y, rotation, orientation);
 
         setMotors(factorSin + rotation, factorCos - rotation, factorCos + rotation, factorSin - rotation);
     }
@@ -109,12 +115,8 @@ public class Robot {
     public void cutTheRope() {
     }
 
-    public void toggleTurbo() {
-        turbo = !turbo;
-    }
-
-    public void TURBO() {
-        turbo = true;
+    public void setTurbo(boolean value) {
+        turbo = value;
     }
 
     public boolean isTurbo() {
@@ -125,10 +127,14 @@ public class Robot {
         final double divider = (turbo ? 1.0 : 7.5);
         final double scale = Stream.of(1.0, lf, lr, rf, rr).mapToDouble(Math::abs).max().getAsDouble();
 
-        leftFront.setPower(lf / scale / divider);
-        leftRear.setPower(lr / scale / divider);
-        rightFront.setPower(rf / scale / divider);
-        rightRear.setPower(rr / scale / divider);
+        leftFront.setPower(getPower(lf, divider, scale, "front left"));
+        leftRear.setPower(getPower(lr, divider, scale, "rear left"));
+        rightFront.setPower(getPower(rf, divider, scale, "front right"));
+        rightRear.setPower(getPower(rr, divider, scale, "rear right"));
     }
 
+    private double getPower(double rf, double divider, double scale, String engine) {
+        telemetry.addData(String.format("Power in %s:", engine), "initial: %f; div: %f; scale: %f", rf, divider, scale);
+        return rf / scale / divider;
+    }
 }
