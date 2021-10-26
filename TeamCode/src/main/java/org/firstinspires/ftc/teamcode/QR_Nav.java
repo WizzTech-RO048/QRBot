@@ -75,7 +75,7 @@ public class QR_Nav extends LinearOpMode {
         cameraManager = ClassFactory.getInstance().getCameraManager();
         cameraName = hardwareMap.get(WebcamName.class, "Webcam");
 
-        robot = new Robot(hardwareMap);
+        robot = new Robot(hardwareMap, telemetry);
 
         gripper = hardwareMap.servo.get("gripper");
         gripper.setPosition(0.0);
