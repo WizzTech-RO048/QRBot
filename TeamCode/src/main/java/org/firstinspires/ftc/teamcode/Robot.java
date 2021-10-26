@@ -99,7 +99,7 @@ public class Robot {
 
         telemetry.addData("Movement", "X: %f\nY: %f\nRotation: %f\norientation: %f\n", x, y, rotation, orientation);
 
-        setMotors(factorSin + rotation, factorCos - rotation, factorCos + rotation, factorSin - rotation);
+        setMotors(factorSin + rotation, factorCos + rotation, factorCos - rotation, factorSin - rotation);
     }
 
     public void stop() {
