@@ -80,70 +80,20 @@ public class Robot {
         }
     }
 
-    public void moveForward(double speedPercentage){
-        final double lf = speedPercentage / 100.0;
-        final double lr = speedPercentage / 100.0;
-        final double rf = speedPercentage / 100.0;
-        final double rr = speedPercentage / 100.0;
-        setMotors(lf, lr, rf, rr, isTurbo());
-    }
-    public void moveBackward(double speedPercentage){
-        final double lf = speedPercentage / 100.0 * -1.0;
-        final double lr = speedPercentage / 100.0 * -1.0;
-        final double rf = speedPercentage / 100.0 * -1.0;
-        final double rr = speedPercentage / 100.0 * -1.0;
-        setMotors(lf, lr, rf, rr, isTurbo());
-    }
-    public void moveRight(double speedPercentage){
-        final double lf = speedPercentage / 100.0;
-        final double lr = speedPercentage / 100.0 * -1.0;
-        final double rf = speedPercentage / 100.0 * -1.0;
-        final double rr = speedPercentage / 100.0;
-        setMotors(lf, lr, rf, rr, isTurbo());
-    }
-    public void moveLeft(double speedPercentage){
-        final double lf = speedPercentage / 100.0 * -1.0;
-        final double lr = speedPercentage / 100.0;
-        final double rf = speedPercentage / 100.0;
-        final double rr = speedPercentage / 100.0 * -1.0;
-        setMotors(lf, lr, rf, rr, isTurbo());
-    }
-    public void rotateLeft(double speedPercentage){
-        final double lf = speedPercentage / 100.0 * -1.0;
-        final double lr = speedPercentage / 100.0 * -1.0;
-        final double rf = speedPercentage / 100.0;
-        final double rr = speedPercentage / 100.0;
-        setMotors(lf, lr, rf, rr, isTurbo());
-    }
-    public void rotateRight(double speedPercentage){
-        final double lf = speedPercentage / 100.0;
-        final double lr = speedPercentage / 100.0;
-        final double rf = speedPercentage / 100.0 * -1.0;
-        final double rr = speedPercentage / 100.0 * -1.0;
-        setMotors(lf, lr, rf, rr, isTurbo());
-    }
-
-    public void diagonalMovement(double speedPercentage){
-        final double lf = speedPercentage / 100;
-        final double lr = 0;
-        final double rf = 0;
-        final double rr = speedPercentage / 100;
-        setMotors(lf, lr, rf, rr, isTurbo());
-    }
-
     public void movingRobot(double x1, double y1, double degrees){
+        double rotationValue = degrees;
+
         final double x = Math.pow(x1, 3.0);
         final double y = Math.pow(y1, 3.0);
-        final double rotationValue = 1.0;
 
         final double rotation = Math.pow(rotationValue, 3.0);
         final double direction = Math.atan2(x, y) - getHeading();
-        final double speed = Math.min(1.0, Math.sqrt(x * x + y * y));
+        final double speed = Math.min(1.0, Math.sqrt(x*x + y*y));
 
-        final double lf = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
-        final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
-        final double rf = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
-        final double rr = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
+        final double lf = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
+        final double lr = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
+        final double rf = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
+        final double rr = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
 
         setMotors(lf, lr, rf, rr, isTurbo());
     }

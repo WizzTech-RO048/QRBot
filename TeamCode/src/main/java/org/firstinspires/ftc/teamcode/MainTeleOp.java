@@ -24,12 +24,13 @@ public class MainTeleOp extends OpMode {
         final double speed = Math.min(1.0, Math.sqrt(x*x + y*y));
 
         final double lf = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
-        final double rf = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
-        final double lr = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
+        final double lr = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
+        final double rf = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
         final double rr = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
 
         robot.setMotors(lf, lr, rf, rr, robot.isTurbo());
     }
+
     @Override
     public void loop(){
         controller.update();
