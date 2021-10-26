@@ -20,6 +20,7 @@ public class Robot {
     private final DcMotor rightFront;
     private final DcMotor rightRear;
     private final DcMotor sbinPahar;
+    private final DcMotor scissorsEngine;
 
     private final Telemetry telemetry;
 
@@ -37,13 +38,14 @@ public class Robot {
         leftRear = hardwareMap.dcMotor.get("lr");
         rightFront = hardwareMap.dcMotor.get("rf");
         rightRear = hardwareMap.dcMotor.get("rr");
-
+        scissorsEngine = hardwareMap.dcMotor.get("scissors");
         sbinPahar = hardwareMap.dcMotor.get("sp");
 
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
         rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
+        scissorsEngine.setDirection(DcMotorSimple.Direction.FORWARD);
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -117,6 +119,10 @@ public class Robot {
 
     public void setTurbo(boolean value) {
         turbo = value;
+    }
+
+    public void moveScissorsEngine(double speed) {
+        scissorsEngine.setPower(speed);
     }
 
     public boolean isTurbo() {
