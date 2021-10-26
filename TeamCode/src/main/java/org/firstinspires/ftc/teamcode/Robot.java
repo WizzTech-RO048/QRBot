@@ -82,12 +82,7 @@ public class Robot {
     }
 
     public void move(double x, double y, double rotation) {
-        x = x * x * x;
-        y = y * y * y;
-        rotation = rotation * rotation * rotation;
-
-        final double heading = (getAngularOrientation() - headingOffset) % (2.0 * Math.PI);
-        final double direction = Math.atan2(x, y) - heading;
+        final double direction = Math.atan2(x, y);
         final double speed = Math.min(1.0, Math.sqrt(x * x + y * y));
         final double factorSin = speed * Math.sin(direction + Math.PI / 4.0);
         final double factorCos = speed * Math.cos(direction + Math.PI / 4.0);
