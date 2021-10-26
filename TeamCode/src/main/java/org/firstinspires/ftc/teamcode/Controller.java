@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class Controller {
-    private Gamepad gamepad;
+    private final Gamepad gamepad;
 
     private int x, y, a, b;
     public double leftStickX, leftStickY;
@@ -14,10 +14,10 @@ public class Controller {
     }
 
     public void update(){
-        if(gamepad.x){ x++; } else{ x = 0; }
-        if(gamepad.y){ y++; } else{ y = 0; }
-        if(gamepad.a){ a++; } else{ a = 0; }
-        if(gamepad.b){ b++; } else{ b = 0; }
+        if (gamepad.x) { x++; } else { x = 0; }
+        if (gamepad.y) { y++; } else { y = 0; }
+        if (gamepad.a) { a++; } else { a = 0; }
+        if (gamepad.b) { b++; } else { b = 0; }
 
         leftStickX = gamepad.left_stick_x;
         leftStickY = gamepad.left_stick_y;
