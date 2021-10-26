@@ -110,7 +110,7 @@ public class Robot {
     // - Features functions
     // -----------------------
     public void sbin() {
-        sbinPahar.setPower(0.5);
+        sbinPahar.setPower(0.05);
         scheduler.schedule(() -> sbinPahar.setPower(0), 3, TimeUnit.SECONDS);
     }
 
@@ -122,7 +122,7 @@ public class Robot {
     }
 
     public void moveScissorsEngine(double speed) {
-        scissorsEngine.setPower(speed);
+        scissorsEngine.setPower(-speed);
     }
 
     public boolean isTurbo() {
@@ -130,7 +130,7 @@ public class Robot {
     }
 
     private void setMotors(double lf, double lr, double rf, double rr) {
-        final double divider = (turbo ? 1.0 : 7.5);
+        final double divider = (turbo ? 1.0 : 2.0);
         final double scale = Stream.of(1.0, lf, lr, rf, rr).mapToDouble(Math::abs).max().getAsDouble();
 
         leftFront.setPower(getPower(lf, divider, scale, "front left"));
