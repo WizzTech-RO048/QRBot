@@ -117,7 +117,6 @@ public class Robot {
     // }
 
     public void moveTo(double speed, double direction) {
-
         final double lf = speed * Math.sin(direction + Math.PI / 4.0); // - rotation;
         final double rf = speed * Math.cos(direction + Math.PI / 4.0); // + rotation;
         final double lr = speed * Math.cos(direction + Math.PI / 4.0); // - rotation;
@@ -126,6 +125,9 @@ public class Robot {
         setMotors(lf, lr, rf, rr, _turbo);
     }
 
+    // -----------------------
+    // - Features functions
+    // -----------------------
     public void sbin(){
         double speed = 0.1;
         try {
@@ -135,6 +137,10 @@ public class Robot {
         } catch(Exception e){
 
         }
+    }
+
+    public void cutTheRope(){
+
     }
 
     public void toggleTurbo() { _turbo = !_turbo; }
