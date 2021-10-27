@@ -54,11 +54,10 @@ public class MainTeleOp extends OpMode {
         }
 
         if(gamepad2.x) {
-            flag_left.setPosition(0.2);
+            flag_left.setPosition(0);
             flag_right.setPosition(0.3);
-        }
-        else {
-            flag_left.setPosition(0.5);
+        } else {
+            flag_left.setPosition(0.3);
             flag_right.setPosition(0);
         }
     }
