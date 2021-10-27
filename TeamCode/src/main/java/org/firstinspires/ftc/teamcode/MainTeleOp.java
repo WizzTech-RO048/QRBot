@@ -19,7 +19,7 @@ public class MainTeleOp extends OpMode {
         robot.move(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
         robot.moveScissorsEngine(gamepad1.right_stick_y);
         if (gamepad1.y) {
-            robot.sbin();
+            robot.shakeGlass();
         }
     }
 }

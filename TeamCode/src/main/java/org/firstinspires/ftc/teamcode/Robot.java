@@ -19,7 +19,7 @@ public class Robot {
     private final DcMotor leftRear;
     private final DcMotor rightFront;
     private final DcMotor rightRear;
-    private final DcMotor sbinPahar;
+    private final DcMotor glass;
     private final DcMotor scissorsEngine;
 
     private final Telemetry telemetry;
@@ -39,7 +39,7 @@ public class Robot {
         rightFront = hardwareMap.dcMotor.get("rf");
         rightRear = hardwareMap.dcMotor.get("rr");
         scissorsEngine = hardwareMap.dcMotor.get("scissors");
-        sbinPahar = hardwareMap.dcMotor.get("sp");
+        glass = hardwareMap.dcMotor.get("sp");
 
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -109,9 +109,9 @@ public class Robot {
     // -----------------------
     // - Features functions
     // -----------------------
-    public void sbin() {
-        sbinPahar.setPower(0.05);
-        scheduler.schedule(() -> sbinPahar.setPower(0), 3, TimeUnit.SECONDS);
+    public void shakeGlass() {
+        glass.setPower(0.05);
+        scheduler.schedule(() -> glass.setPower(0), 3, TimeUnit.SECONDS);
     }
 
     public void cutTheRope() {
@@ -140,7 +140,7 @@ public class Robot {
     }
 
     private double getPower(double rf, double divider, double scale, String engine) {
-        telemetry.addData(String.format("Power in %s:", engine), "initial: %f; div: %f; scale: %f", rf, divider, scale);
+        telemetry.addData(String.format("Power in %s", engine), "initial: %f; div: %f; scale: %f", rf, divider, scale);
         return rf / scale / divider;
     }
 }
