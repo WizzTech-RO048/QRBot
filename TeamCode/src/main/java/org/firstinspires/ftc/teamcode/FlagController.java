@@ -19,12 +19,20 @@ public class FlagController {
     }
 
     public void toggle() {
-        raised = !raised;
-        raise();
+        toggle(0, 1);
     }
 
-    private void raise() {
-        servo.setPosition(raised ? endPos : startPos);
+    public void toggle(double start, double end) {
+        raised = !raised;
+        raise(start, end);
+    }
+
+    private void raise(double start, double end) {
+        servo.setPosition(raised ? lerp(startPos, endPos, start) : lerp(startPos, endPos, end));
         telemetry.addData(String.format("Flag %s status", flagName), "Raised: %b, Position: %f", raised, servo.getPosition());
+    }
+
+    private static double lerp(double a, double b, double p) {
+        return a * (1 - p) + b * p;
     }
 }
