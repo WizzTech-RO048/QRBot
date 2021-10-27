@@ -65,7 +65,7 @@ public class QR_Nav extends LinearOpMode {
     private Servo gripper;
 
     private String lastInstruction = null;
-    private Reader qrCodesReader = new QRCodeReader();
+    private final Reader qrCodesReader = new QRCodeReader();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -181,7 +181,11 @@ public class QR_Nav extends LinearOpMode {
                 break;
         }
 
-        robot.move(x, y, degree);
+        if (degree != 0) {
+            robot.rotate(Math.toRadians(degree));
+        } else {
+            robot.move(x, y);
+        }
 
         try {
             if (instruction.equals(lastInstruction)) {

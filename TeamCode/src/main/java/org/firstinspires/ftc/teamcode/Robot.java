@@ -84,7 +84,11 @@ public class Robot {
         rightRear.setMode(mode);
     }
 
-    public void move(double x, double y, double rotation) {
+    public void rotate(double rotation) {
+        setMotors(-rotation, -rotation, rotation, rotation);
+    }
+
+    public void move(double x, double y) {
         final double orientation = getAngularOrientation();
         final double heading = (orientation - headingOffset) % (2.0 * Math.PI);
         headingOffset = orientation;
@@ -94,9 +98,9 @@ public class Robot {
         final double factorSin = speed * Math.sin(direction + Math.PI / 4.0);
         final double factorCos = speed * Math.cos(direction + Math.PI / 4.0);
 
-        telemetry.addData("Movement", "X: %f\nY: %f\nRotation: %f\norientation: %f\n", x, y, rotation, orientation);
+        telemetry.addData("Movement", "X: %f\nY: %f\nOrientation: %f\n", x, y, orientation);
 
-        setMotors(factorSin - rotation, factorCos - rotation, factorCos + rotation, factorSin + rotation);
+        setMotors(factorSin, factorCos, factorCos, factorSin);
     }
 
     public void stop() {
@@ -131,17 +135,16 @@ public class Robot {
     }
 
     private void setMotors(double lf, double lr, double rf, double rr) {
-        final double divider = (turbo ? 1.0 : 2.0);
         final double scale = Stream.of(1.0, lf, lr, rf, rr).mapToDouble(Math::abs).max().getAsDouble();
 
-        leftFront.setPower(getPower(lf, divider, scale, "front left"));
-        leftRear.setPower(getPower(lr, divider, scale, "rear left"));
-        rightFront.setPower(getPower(rf, divider, scale, "front right"));
-        rightRear.setPower(getPower(rr, divider, scale, "rear right"));
+        leftFront.setPower(getPower(lf, scale, "front left"));
+        leftRear.setPower(getPower(lr, scale, "rear left"));
+        rightFront.setPower(getPower(rf, scale, "front right"));
+        rightRear.setPower(getPower(rr, scale, "rear right"));
     }
 
-    private double getPower(double rf, double divider, double scale, String engine) {
-        telemetry.addData(String.format("Power in %s", engine), "initial: %f; div: %f; scale: %f", rf, divider, scale);
-        return rf / scale / divider;
+    private double getPower(double rf, double scale, String engine) {
+        telemetry.addData(String.format("Power in %s", engine), "initial: %f; turbo: %b; scale: %f", rf, turbo, scale);
+        return rf / (isTurbo() ? 1.0 : 2.0) / scale;
     }
 }

@@ -22,7 +22,15 @@ public class MainTeleOp extends OpMode {
     @Override
     public void loop() {
         robot.setTurbo(gamepad1.right_bumper);
-        robot.move(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+
+        double x = gamepad1.right_stick_x;
+        double y = gamepad1.right_trigger - gamepad1.left_trigger;
+
+        if (y == 0) {
+            robot.rotate(x);
+        } else {
+            robot.move(x, y);
+        }
 
         if (gamepad1.y) {
             robot.shakeGlass();
