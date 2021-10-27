@@ -105,6 +105,7 @@ public class Robot {
 
     public void stop() {
         setMotors(0, 0, 0, 0);
+        telemetry.addData("Scissors position", scissorsEngine.getCurrentPosition());
         // TODO: Bring scissors arm down.
     }
 
@@ -128,6 +129,7 @@ public class Robot {
 
     public void moveScissorsEngine(double speed) {
         scissorsEngine.setPower(speed);
+        telemetry.addData("Scissors move", "Position: %d, Speed: %f", scissorsEngine.getCurrentPosition(), speed);
     }
 
     public boolean isTurbo() {
