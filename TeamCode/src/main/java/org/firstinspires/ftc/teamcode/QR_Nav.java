@@ -68,6 +68,8 @@ public class QR_Nav extends LinearOpMode {
     private String lastInstruction = null;
     private Reader qrCodesReader = new QRCodeReader();
 
+    private int centerX, centerY;
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -304,6 +306,9 @@ public class QR_Nav extends LinearOpMode {
         LuminanceSource source = new RGBLuminanceSource(bitmap.getWidth(), bitmap.getHeight(), pixelsArray);
         BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
 
+        centerX = bitmap.getWidth() / 2;
+        centerY = bitmap.getHeight() / 2;
+        
         try {
             ResultPoint[] resultPoints = qrCodesReader.decode(binaryBitmap).getResultPoints();
             int sizeOfResultPoint = resultPoints.length;
