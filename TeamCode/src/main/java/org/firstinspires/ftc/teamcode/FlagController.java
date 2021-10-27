@@ -8,12 +8,14 @@ public class FlagController {
     private final Telemetry telemetry;
     private final Servo servo;
     private boolean raised = false;
+    private final double startPos, endPos;
 
-    FlagController(HardwareMap hm, Telemetry t, String name, Servo.Direction dir) {
+    FlagController(HardwareMap hm, Telemetry t, String name, double start, double end) {
         telemetry = t;
         flagName = name;
         servo = hm.servo.get(name);
-        servo.setDirection(dir);
+        startPos = start;
+        endPos = end;
     }
 
     public void toggle() {
@@ -22,7 +24,7 @@ public class FlagController {
     }
 
     private void raise() {
-        servo.setPosition(raised ? 0.3 : 0);
+        servo.setPosition(raised ? endPos : startPos);
         telemetry.addData(String.format("Flag %s status", flagName), "Raised: %b, Position: %f", raised, servo.getPosition());
     }
 }
