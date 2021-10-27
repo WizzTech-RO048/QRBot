@@ -93,7 +93,7 @@ public class Robot {
         final double heading = (orientation - headingOffset) % (2.0 * Math.PI);
         headingOffset = orientation;
 
-        final double direction = heading - Math.atan2(x, y);
+        final double direction = Math.atan2(x, y) - heading;
         final double speed = Math.min(1.0, Math.sqrt(x * x + y * y));
         final double factorSin = speed * Math.sin(direction + Math.PI / 4.0);
         final double factorCos = speed * Math.cos(direction + Math.PI / 4.0);
@@ -105,7 +105,7 @@ public class Robot {
 
     public void stop() {
         setMotors(0, 0, 0, 0);
-        telemetry.addData("Scissors position", scissorsEngine.getCurrentPosition());
+        telemetry.addData("Scissors position", "Position: %d, Target: %d", scissorsEngine.getCurrentPosition(), scissorsEngine.getTargetPosition());
         // TODO: Bring scissors arm down.
     }
 
@@ -129,7 +129,7 @@ public class Robot {
 
     public void moveScissorsEngine(double speed) {
         scissorsEngine.setPower(speed);
-        telemetry.addData("Scissors move", "Position: %d, Speed: %f", scissorsEngine.getCurrentPosition(), speed);
+        telemetry.addData("Scissors move", "Position: %d, Target: %d, Speed: %f", scissorsEngine.getCurrentPosition(), scissorsEngine.getTargetPosition(), speed);
     }
 
     public boolean isTurbo() {
