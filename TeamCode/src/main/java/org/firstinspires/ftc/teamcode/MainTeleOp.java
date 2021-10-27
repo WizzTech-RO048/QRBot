@@ -53,7 +53,7 @@ public class MainTeleOp extends OpMode {
         }
 
         if (gamepad2.x) {
-            if (lastFlagsToggleTime == 0.0 || (time - lastFlagsToggleTime) > 1) {
+            if (lastFlagsToggleTime == 0.0 || (time - lastFlagsToggleTime) > 0.7) {
                 flagLeft.toggle();
                 flagRight.toggle();
                 lastFlagsToggleTime = time;
