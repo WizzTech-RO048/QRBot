@@ -2,16 +2,21 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Servo;
 
 
 @TeleOp(name = "MainTeleOp")
 public class MainTeleOp extends OpMode {
     private Robot robot;
+    private FlagController flagLeft, flagRight;
 
     @Override
     public void init() {
         robot = new Robot(hardwareMap, telemetry);
         robot.runUsingEncoders();
+
+        flagLeft = new FlagController(hardwareMap, telemetry, "left_flag", Servo.Direction.FORWARD);
+        flagRight = new FlagController(hardwareMap, telemetry, "right_flag", Servo.Direction.REVERSE);
     }
 
     @Override
@@ -44,6 +49,11 @@ public class MainTeleOp extends OpMode {
             robot.moveScissorsEngine(-1);
         } else {
             robot.moveScissorsEngine(0);
+        }
+
+        if (gamepad2.x) {
+            flagLeft.toggle();
+            flagRight.toggle();
         }
     }
 }
