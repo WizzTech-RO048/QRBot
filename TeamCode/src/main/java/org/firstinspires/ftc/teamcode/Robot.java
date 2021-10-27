@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import java.sql.Time;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -89,7 +90,6 @@ public class Robot {
     private double getAngularOrientation() {
         return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
     }
-
     public void resetHeading() {
         headingOffset = getAngularOrientation();
     }
@@ -148,16 +148,28 @@ public class Robot {
     }
 
     public void goCrazy() {
+        // 1. spread stickers and other stuff
+        // 2. toggle the flags
+        // 3. continous scissors moving
+        // 4. the scissors arm moving up and down, side to side like a roller coaster
+        // 5. rotate trying to drift
+
         if (lastGoCrazyAction != null && !lastGoCrazyAction.isDone()) {
             return;
         }
 
-        rotate(0.7);
-        moveScissorsEngine(0.5);
+        shakeGlass();
+        TimeUnit.SECONDS.sleep(2);
+        stopShakingGlass();
+
         lastGoCrazyAction = scheduler.scheduleWithFixedDelay(() -> {
             flagLeft.toggle(0.7, 1);
             flagRight.toggle(0.7, 1);
         }, 0, 300, TimeUnit.MILLISECONDS);
+
+        moveScissorsEngine(0.5);
+
+        rotate(0.7);
     }
 
     public void setTurbo(boolean value) {
