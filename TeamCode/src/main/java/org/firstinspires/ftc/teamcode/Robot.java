@@ -101,6 +101,7 @@ public class Robot {
 
     public void stop() {
         setMotors(0, 0, 0, 0);
+        // TODO: Bring scissors arm down.
     }
 
     // -----------------------
@@ -122,7 +123,7 @@ public class Robot {
     }
 
     public void moveScissorsEngine(double speed) {
-        scissorsEngine.setPower(-speed);
+        scissorsEngine.setPower(speed);
     }
 
     public boolean isTurbo() {
