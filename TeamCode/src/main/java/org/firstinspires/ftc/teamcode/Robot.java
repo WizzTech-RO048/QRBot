@@ -161,7 +161,7 @@ public class Robot {
         // 8 seconds
         if(extendedArm == false){
             scissorsEngine.setPower(0.5);
-            // TimeUnit.SECONDS.sleep(8);
+            sleep(8000);
             scissorsEngine.setPower(0);
             extendedArm = true;
         }
@@ -170,7 +170,7 @@ public class Robot {
     public void shrinkArm(){
         if(extendedArm == true){
             scissorsEngine.setPower(-0.5);
-            // TimeUnit.SECONDS.sleep(8);
+            sleep(8000);
             scissorsEngine.setPower(0);
             extendedArm = false;
         }
@@ -229,5 +229,11 @@ public class Robot {
     private double getPower(double rf, double scale, String engine) {
         telemetry.addData(String.format("Power in %s", engine), "initial: %f; turbo: %b; scale: %f", rf, turbo, scale);
         return rf / (isTurbo() ? 1.0 : 2.0) / scale;
+    }
+
+    public void sleep(int milis){
+        try{
+            Thread.sleep(milis);
+        } catch(Exception e) {}
     }
 }
