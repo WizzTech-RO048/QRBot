@@ -16,8 +16,8 @@ public class MainTeleOp extends OpMode {
         robot = new Robot(hardwareMap, telemetry);
         robot.runUsingEncoders();
 
-        flagLeft = new FlagController(hardwareMap, telemetry, "left_flag", 0.3, 0);
-        flagRight = new FlagController(hardwareMap, telemetry, "right_flag", 0, 0.3);
+        flagLeft = new FlagController(hardwareMap.servo.get("left_flag"), 0.3, 0);
+        flagRight = new FlagController(hardwareMap.servo.get("right_flag"), 0, 0.3);
     }
 
     @Override

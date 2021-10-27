@@ -10,6 +10,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 
@@ -20,6 +24,7 @@ public class Robot {
     private final DcMotor rightRear;
     private final DcMotor glass;
     private final DcMotor scissorsEngine;
+    private final FlagController flagLeft, flagRight;
 
     private final Telemetry telemetry;
 
@@ -29,6 +34,9 @@ public class Robot {
 
     private double headingOffset = 0.0;
 
+    private final ScheduledExecutorService scheduler;
+    private ScheduledFuture<?> lastGoCrazyAction = null;
+
     public Robot(final HardwareMap hardwareMap, final Telemetry t) {
         telemetry = t;
         leftFront = hardwareMap.dcMotor.get("lf");
@@ -37,6 +45,8 @@ public class Robot {
         rightRear = hardwareMap.dcMotor.get("rr");
         scissorsEngine = hardwareMap.dcMotor.get("scissors");
         glass = hardwareMap.dcMotor.get("sp");
+        flagLeft = new FlagController(hardwareMap.servo.get("left_flag"), 0.3, 0);
+        flagRight = new FlagController(hardwareMap.servo.get("right_flag"), 0, 0.3);
 
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -53,6 +63,8 @@ public class Robot {
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
+
+        scheduler = Executors.newScheduledThreadPool(1);
     }
 
     // -------------------
@@ -60,6 +72,14 @@ public class Robot {
     // -------------------
     public void runUsingEncoders() {
         setMotorsMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void blockingRotate(double degree, double speed) {
+        double initHeading = getAngularOrientation();
+
+        rotate(speed);
+        while(getAngularOrientation() - initHeading != Math.toRadians(degree));
+        stop();
     }
 
     public void runWithoutEncoders() {
@@ -105,8 +125,10 @@ public class Robot {
 
     public void stop() {
         setMotors(0, 0, 0, 0);
-        telemetry.addData("Scissors position", "Position: %d, Target: %d", scissorsEngine.getCurrentPosition(), scissorsEngine.getTargetPosition());
-        // TODO: Bring scissors arm down.
+        if (lastGoCrazyAction != null && !lastGoCrazyAction.isDone()) {
+            moveScissorsEngine(0);
+            lastGoCrazyAction.cancel(true);
+        }
     }
 
     // -----------------------
@@ -121,6 +143,19 @@ public class Robot {
     }
 
     public void cutTheRope() {
+    }
+
+    public void goCrazy() {
+        if (lastGoCrazyAction != null && !lastGoCrazyAction.isDone()) {
+            return;
+        }
+
+        rotate(0.7);
+        moveScissorsEngine(0.5);
+        lastGoCrazyAction = scheduler.scheduleWithFixedDelay(() -> {
+            flagLeft.toggle(0.7, 1);
+            flagRight.toggle(0.7, 1);
+        }, 0, 300, TimeUnit.MILLISECONDS);
     }
 
     public void setTurbo(boolean value) {

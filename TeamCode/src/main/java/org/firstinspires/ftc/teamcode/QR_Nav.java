@@ -63,7 +63,6 @@ public class QR_Nav extends LinearOpMode {
     private FuckingViewPort webcamViewport;
 
     private Robot robot;
-    private Servo gripper;
 
     private String lastInstruction = null;
     private final Reader qrCodesReader = new QRCodeReader();
@@ -79,9 +78,6 @@ public class QR_Nav extends LinearOpMode {
         cameraName = hardwareMap.get(WebcamName.class, "Webcam");
 
         robot = new Robot(hardwareMap, telemetry);
-
-        gripper = hardwareMap.servo.get("gripper");
-        gripper.setPosition(0.0);
 
         // cameraName = hardwareMap.get(WebcamName.class, "Webcam");
 
@@ -110,9 +106,6 @@ public class QR_Nav extends LinearOpMode {
             telemetry.update();
 
             while (opModeIsActive()) {
-                if (gamepad1.a) gripper.setPosition(0.7);
-                if (gamepad1.b) gripper.setPosition(0.3);
-
                 Bitmap bmp = frameQueue.poll();
 
                 if (bmp != null) {
@@ -130,9 +123,9 @@ public class QR_Nav extends LinearOpMode {
     private void onNewFrame(Bitmap frame) {
         String instruction = readQRCode(frame);
 
-        telemetry.addData("width:", frame.getWidth());
-        telemetry.addData("height:", frame.getHeight());
-        telemetry.update();
+//         telemetry.addData("width:", frame.getWidth());
+//         telemetry.addData("height:", frame.getHeight());
+//        telemetry.update();
         
         if (instruction == null) {
             return;
@@ -150,59 +143,49 @@ public class QR_Nav extends LinearOpMode {
         switch (instruction) {
             // in current circumstances, we are going to use case "2" as "forward" and case "1" as "backward"
             case "1":
-                x = 0.0;
-                y = 0.5;
-                degree = 0.0;
+
                 break;   // move backward
             case "2":
-                x = 0.0;
-                y = -0.5;
-                degree = 0.0;
+                robot.blockingRotate(90, 0.3);
+                robot.move(0, 0.3);
+
                 break;  // move forward
             case "3":
-                x = 0.5;
-                y = 0.0;
-                degree = 0.0;
+                robot.blockingRotate(180, 0.3);
+                robot.move(0, 0.3);
+
                 break;   // move right
             case "4":
-                x = -0.5;
-                y = 0.0;
-                degree = 0.0;
+                robot.blockingRotate(90, 0.3);
+                robot.move(0, 0.3);
+
+                telemetry.update();
                 break;  // move left
             case "5":
-                x = 0.0;
-                y = 0.0;
-                degree = 45.0;
+                robot.blockingRotate(270, 0.3);
+                robot.move(0, 0.3);
+
                 break;  // rotate right
             case "6":
-                x = 0.0;
-                y = 0.0;
-                degree = -1.0;
+                robot.blockingRotate(65, 0.3);
+                robot.move(0, -0.3);
+
+                try {
+                    Thread.sleep(300);
+                } catch (Exception ignored) {}
+
+                robot.stop();
+                robot.move(0, 0.3);
+
                 break;  // rotate left
             case "7":
-                robot.stop();
-                robot.cutTheRope();
+
+                robot.goCrazy();
+
                 break; // cut the rope
             case "8":
-                robot.resetHeading();
+
                 break;
-        }
-
-        if (degree != 0) {
-            robot.rotate(Math.toRadians(degree));
-        } else {
-            robot.move(x, y);
-        }
-
-        try {
-            if (instruction.equals(lastInstruction)) {
-                robot.stop();
-                Thread.sleep(1000); // ???
-            }
-        } catch (Exception ignored) {
-
-        } finally {
-            lastInstruction = instruction;
         }
     }
 
