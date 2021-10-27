@@ -154,6 +154,7 @@ public class Robot {
     public void cut() {
         initialCutPosition();
         scissor.setPosition(0.8);
+        sleep(2);
         initialCutPosition();
     }
 
