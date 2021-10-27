@@ -7,20 +7,15 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 
 import com.google.zxing.BinaryBitmap;
-import com.google.zxing.ChecksumException;
-import com.google.zxing.FormatException;
 import com.google.zxing.LuminanceSource;
-import com.google.zxing.NotFoundException;
 import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.Reader;
-import com.google.zxing.Result;
 import com.google.zxing.ResultPoint;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -28,11 +23,9 @@ import org.firstinspires.ftc.robotcore.external.android.util.Size;
 import org.firstinspires.ftc.robotcore.external.function.Continuation;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureRequest;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureSequenceId;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureSession;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCharacteristics;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraException;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraFrame;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraManager;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.collections.EvictingBlockingQueue;
@@ -41,7 +34,6 @@ import org.firstinspires.ftc.robotcore.internal.system.ContinuationSynchronizer;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -68,9 +60,10 @@ public class QR_Nav extends LinearOpMode {
     private final Reader qrCodesReader = new QRCodeReader();
 
     private int centerX, centerY;
+    private static final double MOVE_SPEED = 0.5;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
 
         callbackHandler = CallbackLooper.getDefault().getHandler();
 
@@ -86,17 +79,19 @@ public class QR_Nav extends LinearOpMode {
         try {
             openCamera();
             if (camera == null) {
-                telemetry.addData("ERROR: ", "cannot open camera");
+                telemetry.addData("ERROR", "cannot open camera");
                 telemetry.update();
                 return;
             }
             startCamera();
             if (cameraCaptureSession == null) {
-                telemetry.addData("ERROR: ", "cannot start camera");
+                telemetry.addData("ERROR", "cannot start camera");
                 telemetry.update();
                 return;
             }
             waitForStart();
+
+            robot.move(0, MOVE_SPEED);
 
             int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             webcamViewport = new FuckingViewPort(cameraMonitorViewId);
@@ -123,10 +118,6 @@ public class QR_Nav extends LinearOpMode {
     private void onNewFrame(Bitmap frame) {
         String instruction = readQRCode(frame);
 
-//         telemetry.addData("width:", frame.getWidth());
-//         telemetry.addData("height:", frame.getHeight());
-//        telemetry.update();
-        
         if (instruction == null) {
             return;
         }
@@ -136,46 +127,41 @@ public class QR_Nav extends LinearOpMode {
         // telemetry.addData("heading:", robot.getHeading());
         telemetry.update();
 
-        double x = 0;
-        double y = 0;
-        double degree = 0;
-
         switch (instruction) {
             // in current circumstances, we are going to use case "2" as "forward" and case "1" as "backward"
             case "1":
 
                 break;   // move backward
             case "2":
-                robot.blockingRotate(90, 0.3);
-                robot.move(0, 0.3);
+                robot.blockingRotate(90, MOVE_SPEED);
+                robot.move(0, MOVE_SPEED);
 
                 break;  // move forward
             case "3":
-                robot.blockingRotate(180, 0.3);
-                robot.move(0, 0.3);
+                robot.blockingRotate(180, MOVE_SPEED);
+                robot.move(0, MOVE_SPEED);
 
                 break;   // move right
             case "4":
-                robot.blockingRotate(90, 0.3);
-                robot.move(0, 0.3);
+                robot.blockingRotate(90, MOVE_SPEED);
+                robot.move(0, MOVE_SPEED);
 
-                telemetry.update();
                 break;  // move left
             case "5":
-                robot.blockingRotate(270, 0.3);
-                robot.move(0, 0.3);
+                robot.blockingRotate(270, MOVE_SPEED);
+                robot.move(0, MOVE_SPEED);
 
                 break;  // rotate right
             case "6":
-                robot.blockingRotate(65, 0.3);
-                robot.move(0, -0.3);
+                robot.blockingRotate(65, MOVE_SPEED);
+                robot.move(0, -MOVE_SPEED);
 
                 try {
                     Thread.sleep(300);
                 } catch (Exception ignored) {}
 
                 robot.stop();
-                robot.move(0, 0.3);
+                robot.move(0, MOVE_SPEED);
 
                 break;  // rotate left
             case "7":
