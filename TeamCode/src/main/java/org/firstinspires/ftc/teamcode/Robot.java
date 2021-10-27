@@ -154,7 +154,6 @@ public class Robot {
     public void cut() {
         initialCutPosition();
         scissor.setPosition(0.8);
-        TimeUnit.SECONDS.sleep(1);
         initialCutPosition();
     }
 
@@ -162,7 +161,7 @@ public class Robot {
         // 8 seconds
         if(extendedArm == false){
             scissorsEngine.setPower(0.5);
-            TimeUnit.SECONDS.sleep(8);
+            // TimeUnit.SECONDS.sleep(8);
             scissorsEngine.setPower(0);
             extendedArm = true;
         }
@@ -171,7 +170,7 @@ public class Robot {
     public void shrinkArm(){
         if(extendedArm == true){
             scissorsEngine.setPower(-0.5);
-            TimeUnit.SECONDS.sleep(8);
+            // TimeUnit.SECONDS.sleep(8);
             scissorsEngine.setPower(0);
             extendedArm = false;
         }
@@ -184,7 +183,7 @@ public class Robot {
 
         // 1. spread stickers and other stuff
         shakeGlass();
-        TimeUnit.SECONDS.sleep(2);
+        // TimeUnit.SECONDS.sleep(2);
         stopShakingGlass();
 
         // 2. toggle the flags
