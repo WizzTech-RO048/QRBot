@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class MainTeleOp extends OpMode {
     private Robot robot;
     private FlagController flagLeft, flagRight;
+    private double lastFlagsToggleTime = 0.0;
 
     @Override
     public void init() {
@@ -52,8 +53,11 @@ public class MainTeleOp extends OpMode {
         }
 
         if (gamepad2.x) {
-            flagLeft.toggle();
-            flagRight.toggle();
+            if (lastFlagsToggleTime == 0.0 || (time - lastFlagsToggleTime) > 1) {
+                flagLeft.toggle();
+                flagRight.toggle();
+                lastFlagsToggleTime = time;
+            }
         }
     }
 }
