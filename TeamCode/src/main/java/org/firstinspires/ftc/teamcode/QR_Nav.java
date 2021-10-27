@@ -14,6 +14,7 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.Reader;
 import com.google.zxing.Result;
+import com.google.zxing.ResultPoint;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
@@ -127,6 +128,10 @@ public class QR_Nav extends LinearOpMode {
     private void onNewFrame(Bitmap frame) {
         String instruction = readQRCode(frame);
 
+        telemetry.addData("width:", frame.getWidth());
+        telemetry.addData("height:", frame.getHeight());
+        telemetry.update();
+        
         if (instruction == null) {
             return;
         }
@@ -300,6 +305,14 @@ public class QR_Nav extends LinearOpMode {
         BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
 
         try {
+            ResultPoint[] resultPoints = qrCodesReader.decode(binaryBitmap).getResultPoints();
+            int sizeOfResultPoint = resultPoints.length;
+
+            for(int i = 0; i < sizeOfResultPoint; i++){
+                String formatted = String.format("X: %f, Y: %f", resultPoints[i].getX(), resultPoints[i].getY());
+                telemetry.addData(String.format("Point #%d", i), formatted);
+                telemetry.update();
+            }
             return qrCodesReader.decode(binaryBitmap).getText();
         } catch (Exception e) {
             e.printStackTrace();
