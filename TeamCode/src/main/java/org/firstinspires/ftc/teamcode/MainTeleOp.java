@@ -21,6 +21,8 @@ public class MainTeleOp extends OpMode {
         robot.moveScissorsEngine(gamepad1.right_stick_y);
         if (gamepad1.y) {
             robot.shakeGlass();
+        } else {
+            robot.stopShakingGlass();
         }
     }
 }
