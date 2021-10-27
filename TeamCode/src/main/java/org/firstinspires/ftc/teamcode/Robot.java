@@ -109,6 +109,8 @@ public class Robot {
     }
 
     public void move(double x, double y) {
+        y = -y;
+
         final double orientation = getAngularOrientation();
         final double heading = (orientation - headingOffset) % (2.0 * Math.PI);
         headingOffset = orientation;
