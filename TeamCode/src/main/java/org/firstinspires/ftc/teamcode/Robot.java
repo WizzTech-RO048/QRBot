@@ -10,7 +10,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import java.util.concurrent.*;
 import java.util.stream.Stream;
 
 
@@ -29,9 +28,6 @@ public class Robot {
     private final BNO055IMU imu;
 
     private double headingOffset = 0.0;
-
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private ScheduledFuture<?> glassShakeHandle = null;
 
     public Robot(final HardwareMap hardwareMap, final Telemetry t) {
         telemetry = t;
@@ -111,21 +107,11 @@ public class Robot {
     // - Features functions
     // -----------------------
     public void shakeGlass() {
-        if (glassShakeHandle != null && !glassShakeHandle.isDone()) {
-            return;
-        }
-
-        glass.setPower(0.05);
-        glassShakeHandle = scheduler.schedule(() -> glass.setPower(0), 3, TimeUnit.SECONDS);
+        glass.setPower(0.5);
     }
 
     public void stopShakingGlass() {
-        if (glassShakeHandle == null || glassShakeHandle.isDone()) {
-            return;
-        }
-
         glass.setPower(0.0);
-        glassShakeHandle.cancel(true);
     }
 
     public void cutTheRope() {
