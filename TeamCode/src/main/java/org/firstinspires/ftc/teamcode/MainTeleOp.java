@@ -11,6 +11,7 @@ public class MainTeleOp extends OpMode {
     @Override
     public void init(){
         robot = new Robot(hardwareMap, telemetry);
+        robot.runUsingEncoders();
     }
 
     @Override
