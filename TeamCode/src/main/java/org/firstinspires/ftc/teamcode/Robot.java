@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.*;
@@ -38,6 +39,10 @@ public class Robot {
     private final ScheduledExecutorService scheduler;
     private ScheduledFuture<?> lastGoCrazyAction = null;
 
+    public boolean extendedArm = false;
+
+    private Servo scissor;
+
     public Robot(final HardwareMap hardwareMap, final Telemetry t) {
         telemetry = t;
         leftFront = hardwareMap.dcMotor.get("lf");
@@ -48,6 +53,7 @@ public class Robot {
         glass = hardwareMap.dcMotor.get("sp");
         flagLeft = new FlagController(hardwareMap.servo.get("left_flag"), 0.3, 0);
         flagRight = new FlagController(hardwareMap.servo.get("right_flag"), 0, 0.3);
+        scissor = hardwareMap.servo.get("scissor");
 
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -144,31 +150,58 @@ public class Robot {
         glass.setPower(0.0);
     }
 
-    public void cutTheRope() {
+    public void initialCutPosition(){ scissor.setPosition(0.0); }
+    public void cut() {
+        initialCutPosition();
+        scissor.setPosition(0.8);
+        TimeUnit.SECONDS.sleep(1);
+        initialCutPosition();
+    }
+
+    public void extendArm(){
+        // 8 seconds
+        if(extendedArm == false){
+            scissorsEngine.setPower(0.5);
+            TimeUnit.SECONDS.sleep(8);
+            scissorsEngine.setPower(0);
+            extendedArm = true;
+        }
+    }
+
+    public void shrinkArm(){
+        if(extendedArm == true){
+            scissorsEngine.setPower(-0.5);
+            TimeUnit.SECONDS.sleep(8);
+            scissorsEngine.setPower(0);
+            extendedArm = false;
+        }
     }
 
     public void goCrazy() {
-        // 1. spread stickers and other stuff
-        // 2. toggle the flags
-        // 3. continous scissors moving
-        // 4. the scissors arm moving up and down, side to side like a roller coaster
-        // 5. rotate trying to drift
-
         if (lastGoCrazyAction != null && !lastGoCrazyAction.isDone()) {
             return;
         }
 
+        // 1. spread stickers and other stuff
         shakeGlass();
         TimeUnit.SECONDS.sleep(2);
         stopShakingGlass();
 
+        // 2. toggle the flags
         lastGoCrazyAction = scheduler.scheduleWithFixedDelay(() -> {
             flagLeft.toggle(0.7, 1);
             flagRight.toggle(0.7, 1);
         }, 0, 300, TimeUnit.MILLISECONDS);
 
-        moveScissorsEngine(0.5);
+        // 3. continous scissors moving
+        for(int i = 0; i < 5; i++){
+            cut();
+        }
 
+        // 4. the scissors arm moving up and down, side to side like a roller coaster
+
+
+        // 5. rotate trying to drift
         rotate(0.7);
     }
 
