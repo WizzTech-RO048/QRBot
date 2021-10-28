@@ -249,7 +249,7 @@ public class QR_Nav extends LinearOpMode {
                     // robot.blockingRotate(90, MOVE_SPEED);
                     // robot.blockingRotate(90, MOVE_SPEED);
 
-//                    robot.move(0, MOVE_SPEED);
+//                    robot.move(0, MOVE_SPEED); 
 //                    robot.sleep(4000);
 //                    robot.stop();
 
