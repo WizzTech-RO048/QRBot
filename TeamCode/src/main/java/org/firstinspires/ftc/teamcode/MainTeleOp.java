@@ -45,10 +45,12 @@ public class MainTeleOp extends OpMode {
         }
 
         if (gamepad1.dpad_up) {
-            robot.moveScissorsEngine(1);
-        } else if (gamepad1.dpad_down) {
-            robot.moveScissorsEngine(-1);
-        } else {
+            robot.scissorsEngine.setPower(0.5);
+        }
+        else if (gamepad1.dpad_down) {
+            robot.scissorsEngine.setPower(-0.5);
+        }
+        else {
             robot.moveScissorsEngine(0);
         }
 

@@ -11,6 +11,8 @@ public class FlagController {
         servo = s;
         startPos = start;
         endPos = end;
+
+        s.setPosition(start);
     }
 
     public void toggle() {

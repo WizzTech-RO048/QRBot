@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.icu.util.Output;
 import android.view.Surface;
 import android.view.SurfaceView;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 
 import java.io.OutputStream;
+import java.util.Objects;
 
 public class FuckingViewPort{
     private LinearLayout viewportContainerLayout;
@@ -24,43 +26,38 @@ public class FuckingViewPort{
 
     public FuckingViewPort(int containerLayoutId) {
         setupViewport(containerLayoutId);
-
         // AppUtil.getInstance().getApplication().registerComponentCallbacks();
         // OpModeManagerImpl.getOpModeManagerOfActivity(AppUtil.getInstance().getActivity()).registerListener();
     }
 
     private void setupViewport(final int containerLayoutId) {
-        AppUtil.getInstance().getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    viewportContainerLayout = (LinearLayout) AppUtil.getInstance().getActivity().findViewById(containerLayoutId);
+        Objects.requireNonNull(AppUtil.getInstance().getActivity()).runOnUiThread(() -> {
+            try {
+                viewportContainerLayout = (LinearLayout) AppUtil.getInstance().getActivity().findViewById(containerLayoutId);
 
-                    if(viewportContainerLayout == null) {
-                        throw new Exception("Viewport container specified by user does not exist");
-                    } else if(viewportContainerLayout.getChildCount() != 0) {
-                        throw new Exception("Viewport container specified by user is not empty!");
-                    }
+                if(viewportContainerLayout == null)
+                    throw new Exception("Viewport container specified by user does not exist");
+                else if(viewportContainerLayout.getChildCount() != 0) {
+                    throw new Exception("Viewport container specified by user is not empty!");
+                }
 
-                    view = new SurfaceView(AppUtil.getInstance().getActivity());
-                    viewportContainerLayout.setVisibility(View.VISIBLE);
-                    viewportContainerLayout.addView(view);
-                } catch (Exception e) { e.printStackTrace(); }
-            }
+                view = new SurfaceView(AppUtil.getInstance().getActivity());
+                viewportContainerLayout.setVisibility(View.VISIBLE);
+                viewportContainerLayout.addView(view);
+            } catch (Exception e) { e.printStackTrace(); }
         });
     }
 
     public void draw(Bitmap currentBitmap)
     {
-        while (true)
-        {
+
             Canvas canvas = view.getHolder().lockCanvas();
 
             if (canvas != null)
             {
                 if(currentBitmap != null)
                 {
-                    Bitmap newBitmap = currentBitmap.copy(currentBitmap.getConfig(), true);
+                    Bitmap newBitmap = currentBitmap.copy(currentBitmap.getConfig(), false);
 
                     Paint paint = new Paint();
 
@@ -71,6 +68,6 @@ public class FuckingViewPort{
             }
             
             view.getHolder().unlockCanvasAndPost(canvas);
-        }
+
     }
 }
