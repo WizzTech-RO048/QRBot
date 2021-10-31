@@ -192,34 +192,16 @@ public class QR_Nav extends LinearOpMode {
             telemetry.update();
 
             switch (instruction) {
-                // in current circumstances, we are going to use case "2" as "forward" and case "1" as "backward"
-                case "1":
-//                    robot.move(0, MOVE_SPEED);
-
-//                    try{
-//                        Thread.sleep(6400);
-//                    } catch (Exception e) {}
+                case "1": // toggles moving
                     canMove = true;
                     robot.stop();
-                    break;   // move backward
-                case "2":
-                    //robot.blockingRotate(90, 0.1);
-                    //robot.move(0, MOVE_SPEED);
-
+                    break;
+                case "2": // turbo mode
                     robot.setTurbo(true);
                     telemetry.addData("started turbo", robot.isTurbo());
                     telemetry.update();
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (Exception e) {}
-
-                    break;  // move forward
-                case "3":
-//                    robot.blockingRotate(180, MOVE_SPEED);
-//                    robot.move(0, MOVE_SPEED);
-
-                    break;   // move right
-                case "4":
+                    break;
+                case "4": // cutting mode
                     robot.extendArm();
 
                     robot.sleep(1000);
@@ -227,16 +209,8 @@ public class QR_Nav extends LinearOpMode {
                     robot.sleep(1000);
 
                     robot.shrinkArm();
-
-//                    robot.blockingRotate(90, MOVE_SPEED);
-//
-//                    robot.move(0, MOVE_SPEED);
-//
-//                    robot.sleep(4000);
-//                    robot.stop();
-
-                    break;  // move left
-                case "5":
+                    break;
+                case "5": // cutting mode
                     robot.extendArm();
 
                     robot.sleep(1000);
@@ -244,35 +218,9 @@ public class QR_Nav extends LinearOpMode {
                     robot.sleep(1000);
 
                     robot.shrinkArm();
-
-                    // robot.blockingRotate(90, MOVE_SPEED);
-                    // robot.blockingRotate(90, MOVE_SPEED);
-                    // robot.blockingRotate(90, MOVE_SPEED);
-
-//                    robot.move(0, MOVE_SPEED); 
-//                    robot.sleep(4000);
-//                    robot.stop();
-
-                    break;  // rotate right
-                case "6":
-                    robot.cut();
-
-//                    robot.blockingRotate(65, MOVE_SPEED);
-//                    robot.move(0, -MOVE_SPEED);
-//
-//                    robot.sleep(300);
-//
-//                    robot.stop();
-//                    robot.move(0, MOVE_SPEED);
-
-                    break;  // rotate left
-                case "7":
-
+                    break;
+                case "7": // crazy mode
                     robot.goCrazy();
-
-                    break; // cut the rope
-                case "8":
-
                     break;
             }
         }
@@ -392,17 +340,17 @@ public class QR_Nav extends LinearOpMode {
         centerY = bitmap.getHeight() / 2;
 
         try {
-            // printing the (x, y) coordinates of the QR code
-//            ResultPoint[] resultPoints = qrCodesReader.decode(binaryBitmap).getResultPoints();
-//            int sizeOfResultPoint = resultPoints.length;
-//            for (int i = 0; i < sizeOfResultPoint; i++) {
-//                String formatted = String.format("X: %f, Y: %f", resultPoints[i].getX(), resultPoints[i].getY());
-//                telemetry.addData(String.format("Point #%d", i), formatted);
-//                telemetry.update();
-//            }
-
             // returning the string of the QR code
             decoded = qrCodesReader.decode(binaryBitmap).getText();
+
+            // printing the (x, y) coordinates of the QR code
+            ResultPoint[] resultPoints = qrCodesReader.decode(binaryBitmap).getResultPoints();
+            int sizeOfResultPoint = resultPoints.length;
+            for (int i = 0; i < sizeOfResultPoint; i++) {
+               String formatted = String.format("X: %f, Y: %f", resultPoints[i].getX(), resultPoints[i].getY());
+                telemetry.addData(String.format("Point #%d", i), formatted);
+                telemetry.update();
+            }
         } catch (NotFoundException e) {
             e.printStackTrace();
         } catch (ChecksumException e) {

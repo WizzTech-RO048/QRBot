@@ -193,26 +193,21 @@ public class Robot {
             return;
         }
 
-        // 1. spread stickers and other stuff
+        // spread stickers and other stuff
         shakeGlass();
-        // TimeUnit.SECONDS.sleep(2);
-        // stopShakingGlass();
 
-        // 2. toggle the flags
+        // toggle the flags
         lastGoCrazyAction = scheduler.scheduleWithFixedDelay(() -> {
             flagLeft.toggle(0.7, 1);
             flagRight.toggle(0.7, 1);
         }, 0, 300, TimeUnit.MILLISECONDS);
 
-        // 3. continous scissors moving
+        // continous scissors moving
         for(int i = 0; i < 5; i++){
             cut();
         }
 
-        // 4. the scissors arm moving up and down, side to side like a roller coaster
-
-
-        // 5. rotate trying to drift
+        // rotating trying to drift
         rotate(0.7);
     }
 
