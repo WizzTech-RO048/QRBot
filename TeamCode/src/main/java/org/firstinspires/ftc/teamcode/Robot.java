@@ -7,10 +7,14 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.*;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.sql.Time;
 import java.util.concurrent.Executors;
@@ -21,10 +25,10 @@ import java.util.stream.Stream;
 
 
 public class Robot {
-    private final DcMotorEx leftFront;
-    private final DcMotorEx leftRear;
-    private final DcMotorEx rightFront;
-    private final DcMotorEx rightRear;
+    private final DcMotor leftFront;
+    private final DcMotor leftRear;
+    private final DcMotor rightFront;
+    private final DcMotor rightRear;
     private final DcMotor glass;
     public final DcMotor scissorsEngine;
     private final FlagController flagLeft, flagRight;
@@ -34,7 +38,6 @@ public class Robot {
     private boolean turbo = false;
 
     private final BNO055IMU imu;
-
     private double headingOffset = 0.0;
 
     private final ScheduledExecutorService scheduler;
@@ -44,12 +47,11 @@ public class Robot {
 
     private Servo scissor;
 
-    public Robot(final HardwareMap hardwareMap, final Telemetry t) {
-        telemetry = t;
-        leftFront = hardwareMap.get(DcMotorEx.class, "lf");
-        leftRear = hardwareMap.get(DcMotorEx.class, "lr");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rf");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rr");
+    public Robot(final HardwareMap hardwareMap, final Telemetry telemetry) {
+        leftFront = hardwareMap.dcMotor.get("lf");
+        leftRear = hardwareMap.dcMotor.get("lr");
+        rightFront = hardwareMap.dcMotor.get("rf");
+        rightRear = hardwareMap.dcMotor.get("rr");
 
         scissorsEngine = hardwareMap.dcMotor.get("scissors");
         glass = hardwareMap.dcMotor.get("sp");
@@ -79,9 +81,8 @@ public class Robot {
     // -------------------
     // - Encoding functions
     // -------------------
-    public void runUsingEncoders() {
-        setMotorsMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
+    public void runUsingEncoders() { setMotorsMode(DcMotor.RunMode.RUN_USING_ENCODER, leftFront, leftRear, rightFront, rightRear); }
+    public void runWithoutEncoders() { setMotorsMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER, leftFront, leftRear, rightFront, rightRear); }
 
     public void blockingRotate(double degree, double speed) {
         double initHeading = getAngularOrientation();
@@ -96,47 +97,49 @@ public class Robot {
         stop();
     }
 
-    public void runWithoutEncoders() {
-        setMotorsMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
 
+    private double getRawHeading() { return angles.firstAngle; }
+    public double getHeading() { return (getRawHeading() - headingOffset) % (2.0 * Math.PI); }
+    public double getHeadingDegrees() { return Math.toDegrees(getHeading()); }
+    public void resetHeading() { headingOffset = getRawHeading(); }
     private double getAngularOrientation() {
         return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
     }
 
-    public void resetHeading() {
-        headingOffset = getAngularOrientation();
-    }
 
     // -------------------
     // - Motors functions
     // -------------------
-    private void setMotorsMode(DcMotor.RunMode mode) {
-        leftFront.setMode(mode);
-        leftRear.setMode(mode);
-        rightFront.setMode(mode);
-        rightRear.setMode(mode);
+    private void setMotorsMode(DcMotor.RunMode mode, DcMotor ... motors) {
+        for(DcMotor motor : motors){
+            motor.setMode(mode);
+        }
     }
 
     public void rotate(double rotation) {
         setMotors(-rotation, -rotation, rotation, rotation);
     }
 
-    public void move(double x, double y) {
-        y = -y;
+    public void move(double x1, double y1, double stickX) {
+
+        final double x = Math.pow(x1, 3.0);
+        final double y = Math.pow(y1, 3.0);
+
+        final double rotation = Math.pow(stickX, 3.0);
+        final double direction = Math.atan2(x, y) - getHeading();
+        final double speed = Math.min(1.0, Math.sqrt(x * x + y * y));
 
         final double orientation = getAngularOrientation();
         final double heading = (orientation - headingOffset) % (2.0 * Math.PI);
         headingOffset = orientation;
 
-        final double direction = Math.atan2(x, y) - heading;
-        final double speed = Math.min(1.0, Math.sqrt(x * x + y * y));
-        final double factorSin = speed * Math.sin(direction + Math.PI / 4.0);
-        final double factorCos = speed * Math.cos(direction + Math.PI / 4.0);
-
+        final double lf = speed * Math.sin(direction + Math.PI / 4.0) + rotation;
+        final double lr = speed * Math.cos(direction + Math.PI / 4.0) - rotation;
+        final double rf = speed * Math.cos(direction + Math.PI / 4.0) + rotation;
+        final double rr = speed * Math.sin(direction + Math.PI / 4.0) - rotation;
         telemetry.addData("Movement", "X: %f\nY: %f\nOrientation: %f\n", x, y, orientation);
 
-        setMotors(factorSin, factorCos, factorCos, factorSin);
+        setMotors(lf, lr, rf, rr);
     }
 
     public void stop() {
@@ -233,7 +236,17 @@ public class Robot {
         rightRear.setVelocity(rr);
     }
 
-    private void setMotors(double lf, double lr, double rf, double rr) {
+    private static double maxAbs(double ... xs){
+        double ret = Double.MIN_VALUE;
+        for(double x : xs){
+            if(Math.abs(x) > ret){
+                ret = Math.abs(x);
+            }
+        }
+        return ret;
+    }
+
+    private void setMotors(double _lf, double _lr, double _rf, double _rr) {
 //        final double scale = Stream.of(1.0, lf, lr, rf, rr).mapToDouble(Math::abs).max().getAsDouble();
 //
 //        leftFront.setPower(getPower(lf, scale, "front left"));
@@ -241,10 +254,13 @@ public class Robot {
 //        rightFront.setPower(getPower(rf, scale, "front right"));
 //        rightRear.setPower(getPower(rr, scale, "rear right"));
 
-        leftFront.setPower(lf);
-        leftRear.setPower(lr);
-        rightFront.setPower(rf);
-        rightRear.setPower(rr);
+        final double divider = (isTurbo() ? 1.0 : 7.5);
+        final double scale = maxAbs(1.0, _lf, _lr, _rf, _rr);
+
+        leftFront.setPower(_lf / scale / divider);
+        leftRear.setPower(_lr / scale / divider);
+        rightFront.setPower(_rf / scale / divider);
+        rightRear.setPower(_rr / scale / divider);
     }
 
     private double getPower(double rf, double scale, String engine) {
