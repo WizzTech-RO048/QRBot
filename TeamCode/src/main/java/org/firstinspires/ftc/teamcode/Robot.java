@@ -1,265 +1,145 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.*;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import java.sql.Time;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
-
 
 public class Robot {
-    private final DcMotorEx leftFront;
-    private final DcMotorEx leftRear;
-    private final DcMotorEx rightFront;
-    private final DcMotorEx rightRear;
-    private final DcMotor glass;
-    public final DcMotor scissorsEngine;
+    static class Wheels {
+        private static final String
+                HW_MOTOR_LEFT_FRONT = "wheelLeftFront",
+                HW_MOTOR_LEFT_REAR = "wheelLeftRear",
+                HW_MOTOR_RIGHT_FRONT = "wheelRightFront",
+                HW_MOTOR_RIGHT_REAR = "wheelRightRear";
+
+        private static DcMotorEx getMotor(HardwareMap map, String name) {
+            DcMotorEx motor = map.get(DcMotorEx.class, name);
+            // Reverse direction because it seems that the wheels spin opposite
+            // to what is set by the program.
+            motor.setDirection(DcMotorSimple.Direction.REVERSE);
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            return motor;
+        }
+
+        private final DcMotorEx leftFront, leftRear, rightFront, rightRear;
+        private final Telemetry telemetry;
+
+        private final double encoderTicksPerSecond;
+
+        Wheels(HardwareMap map, Telemetry telemetry, double encoderResolution, double rpm) {
+            leftFront = getMotor(map, HW_MOTOR_LEFT_FRONT);
+            leftRear = getMotor(map, HW_MOTOR_LEFT_REAR);
+            rightFront = getMotor(map, HW_MOTOR_RIGHT_FRONT);
+            rightRear = getMotor(map, HW_MOTOR_RIGHT_REAR);
+
+            this.telemetry = telemetry;
+            this.encoderTicksPerSecond = (rpm / 60) * encoderResolution;
+
+            useEncoders(true);
+        }
+
+        public void useEncoders(boolean shouldUse) {
+            DcMotor.RunMode mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+            if (shouldUse) {
+                mode = DcMotor.RunMode.RUN_USING_ENCODER;
+            }
+
+            leftFront.setMode(mode);
+            leftRear.setMode(mode);
+            rightFront.setMode(mode);
+            rightRear.setMode(mode);
+        }
+
+        /**
+         * @param v The throttle on the vertical axis of the robot.
+         * @param h The throttle on the horizontal axis of the robot.
+         * @param r The rotation power around the robot's axis.
+         */
+        public void move(double v, double h, double r) {
+            v = normalize(v);
+            h = normalize(h);
+            r = -normalize(r); // This has to be reversed due to the wheels spinning in reverse.
+
+            telemetry.addData("Input", "X: %f, Y: %f, R: %f", v, h, r);
+
+            // TODO: Formulas? Robot does not seem to rotate correctly when vertical throttle is applied.
+
+            double[] input = {
+                    v + h - r, // left front
+                    v - h - r, // left rear
+                    v - h + r, // right front
+                    v + h + r  // right rear
+            };
+
+            double highest = 0;
+
+            for (double d : input) {
+                double abs = Math.abs(d);
+                if (abs > highest) {
+                    highest = abs;
+                }
+            }
+
+            highest = Math.max(highest, 1);
+
+            for (int i = 0; i < input.length; i++) {
+                input[i] /= highest;
+                telemetry.addData(String.format("Engine %d", i), input[i]);
+            }
+
+            setPower(leftFront, input[0]);
+            setPower(leftRear, input[1]);
+            setPower(rightFront, input[2]);
+            setPower(rightRear, input[3]);
+        }
+
+        private void setPower(DcMotorEx engine, double power) {
+            engine.setVelocity(power * encoderTicksPerSecond);
+        }
+
+        public void stop() {
+            setPower(leftFront, 0.0);
+            setPower(leftRear, 0.0);
+            setPower(rightFront, 0.0);
+            setPower(rightRear, 0.0);
+        }
+
+        private static double normalize(double val) {
+            return Math.max(-1, Math.min(val, 1));
+        }
+    }
+
+    public final Wheels wheels;
+    private final DcMotor confettiBowl;
+    private final DcMotor scissorsArm;
+    private final Servo scissor;
     private final FlagController flagLeft, flagRight;
+
+    private final BNO055IMU orientation;
 
     private final Telemetry telemetry;
 
-    private boolean turbo = false;
-
-    private final BNO055IMU imu;
-
-    private double headingOffset = 0.0;
-
-    private final ScheduledExecutorService scheduler;
-    private ScheduledFuture<?> lastGoCrazyAction = null;
-
-    public boolean extendedArm = false;
-
-    private Servo scissor;
+    private static final String HW_MOTOR_SCISSORS_ARM = "scissorsArm";
+    private static final String HW_MOTOR_CONFETTI_BOWL = "confettiBowl";
+    private static final String HW_SERVO_FLAG_LEFT = "flagLeft";
+    private static final String HW_SERVO_FLAG_RIGHT = "flagRight";
+    private static final String HW_SERVO_SCISSORS = "scissors";
 
     public Robot(final HardwareMap hardwareMap, final Telemetry t) {
+        wheels = new Wheels(hardwareMap, t, 384.5, 435);
+        confettiBowl = hardwareMap.dcMotor.get(HW_MOTOR_CONFETTI_BOWL);
+        scissorsArm = hardwareMap.dcMotor.get(HW_MOTOR_SCISSORS_ARM);
+        scissor = hardwareMap.servo.get(HW_SERVO_SCISSORS);
+        flagLeft = new FlagController(hardwareMap.servo.get(HW_SERVO_FLAG_LEFT), 0.3, 0);
+        flagRight = new FlagController(hardwareMap.servo.get(HW_SERVO_FLAG_RIGHT), 0, 0.3);
+
+        orientation = hardwareMap.get(BNO055IMU.class, "imu");
+        orientation.initialize(new BNO055IMU.Parameters());
+
         telemetry = t;
-        leftFront = hardwareMap.get(DcMotorEx.class, "lf");
-        leftRear = hardwareMap.get(DcMotorEx.class, "lr");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rf");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rr");
-
-        scissorsEngine = hardwareMap.dcMotor.get("scissors");
-        glass = hardwareMap.dcMotor.get("sp");
-        flagLeft = new FlagController(hardwareMap.servo.get("left_flag"), 0.3, 0);
-        flagRight = new FlagController(hardwareMap.servo.get("right_flag"), 0, 0.3);
-        scissor = hardwareMap.servo.get("scissor");
-
-        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
-        scissorsEngine.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
-        parameters.loggingEnabled = true;
-        parameters.loggingTag = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        imu.initialize(parameters);
-
-        scheduler = Executors.newScheduledThreadPool(1);
     }
-
-    // -------------------
-    // - Encoding functions
-    // -------------------
-    public void runUsingEncoders() {
-        setMotorsMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-    public void blockingRotate(double degree, double speed) {
-        double initHeading = getAngularOrientation();
-
-        rotate(speed);
-
-        while(Math.abs(Math.abs(Math.toDegrees(getAngularOrientation() - initHeading) % 360) - degree) > 5) {
-            // telemetry.addData("Angular difference", Math.abs(Math.abs(Math.toDegrees(getAngularOrientation() - initHeading) % 360) - degree));
-            // telemetry.update();
-        }
-
-        stop();
-    }
-
-    public void runWithoutEncoders() {
-        setMotorsMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
-    private double getAngularOrientation() {
-        return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
-    }
-
-    public void resetHeading() {
-        headingOffset = getAngularOrientation();
-    }
-
-    // -------------------
-    // - Motors functions
-    // -------------------
-    private void setMotorsMode(DcMotor.RunMode mode) {
-        leftFront.setMode(mode);
-        leftRear.setMode(mode);
-        rightFront.setMode(mode);
-        rightRear.setMode(mode);
-    }
-
-    public void rotate(double rotation) {
-        setMotors(-rotation, -rotation, rotation, rotation);
-    }
-
-    public void move(double x, double y) {
-        y = -y;
-
-        final double orientation = getAngularOrientation();
-        final double heading = (orientation - headingOffset) % (2.0 * Math.PI);
-        headingOffset = orientation;
-
-        final double direction = Math.atan2(x, y) - heading;
-        final double speed = Math.min(1.0, Math.sqrt(x * x + y * y));
-        final double factorSin = speed * Math.sin(direction + Math.PI / 4.0);
-        final double factorCos = speed * Math.cos(direction + Math.PI / 4.0);
-
-        telemetry.addData("Movement", "X: %f\nY: %f\nOrientation: %f\n", x, y, orientation);
-
-        setMotors(factorSin, factorCos, factorCos, factorSin);
-    }
-
-    public void stop() {
-        setMotors(0, 0, 0, 0);
-        if (lastGoCrazyAction != null && !lastGoCrazyAction.isDone()) {
-            moveScissorsEngine(0);
-            lastGoCrazyAction.cancel(true);
-        }
-    }
-
-    // -----------------------
-    // - Features functions
-    // -----------------------
-    public void shakeGlass() {
-        glass.setPower(0.5);
-    }
-
-    public void stopShakingGlass() {
-        glass.setPower(0.0);
-    }
-
-    public void initialCutPosition(){ scissor.setPosition(1); }
-
-    public void cut() {
-        initialCutPosition();
-        sleep(1000);
-        scissor.setPosition(0);
-        sleep(1000);
-        initialCutPosition();
-    }
-
-    public void extendArm(){
-        // 8 seconds
-        if(!extendedArm){
-            scissorsEngine.setPower(0.5);
-            // TimeUnit.SECONDS.sleep(8);
-            sleep(16500);
-            scissorsEngine.setPower(0);
-            extendedArm = true;
-        }
-    }
-
-    public void shrinkArm(){
-        if(extendedArm){
-            scissorsEngine.setPower(-0.5);
-            sleep(16500);
-            scissorsEngine.setPower(0);
-            extendedArm = false;
-        }
-    }
-
-    public void goCrazy() {
-        if (lastGoCrazyAction != null && !lastGoCrazyAction.isDone()) {
-            return;
-        }
-
-        // 1. spread stickers and other stuff
-        shakeGlass();
-        // TimeUnit.SECONDS.sleep(2);
-        // stopShakingGlass();
-
-        // 2. toggle the flags
-        lastGoCrazyAction = scheduler.scheduleWithFixedDelay(() -> {
-            flagLeft.toggle(0.7, 1);
-            flagRight.toggle(0.7, 1);
-        }, 0, 300, TimeUnit.MILLISECONDS);
-
-        // 3. continous scissors moving
-        for(int i = 0; i < 5; i++){
-            cut();
-        }
-
-        // 4. the scissors arm moving up and down, side to side like a roller coaster
-
-
-        // 5. rotate trying to drift
-        rotate(0.7);
-    }
-
-    public void setTurbo(boolean value) {
-        turbo = value;
-    }
-
-    public void moveScissorsEngine(double speed) {
-        scissorsEngine.setPower(speed);
-        telemetry.addData("Scissors move", "Position: %d, Target: %d, Speed: %f", scissorsEngine.getCurrentPosition(), scissorsEngine.getTargetPosition(), speed);
-    }
-
-    public boolean isTurbo() {
-        return turbo;
-    }
-
-    private void setMotorsVelocity(double lf, double lr, double rf, double rr) {
-        // final double scale = Stream.of(1.0, lf, lr, rf, rr).mapToDouble(Math::abs).max().getAsDouble();
-
-        leftFront.setVelocity(lf);
-        leftRear.setVelocity(lr);
-        rightFront.setVelocity(rf);
-        rightRear.setVelocity(rr);
-    }
-
-    private void setMotors(double lf, double lr, double rf, double rr) {
-//        final double scale = Stream.of(1.0, lf, lr, rf, rr).mapToDouble(Math::abs).max().getAsDouble();
-//
-//        leftFront.setPower(getPower(lf, scale, "front left"));
-//        leftRear.setPower(getPower(lr, scale, "rear left"));
-//        rightFront.setPower(getPower(rf, scale, "front right"));
-//        rightRear.setPower(getPower(rr, scale, "rear right"));
-
-        leftFront.setPower(lf);
-        leftRear.setPower(lr);
-        rightFront.setPower(rf);
-        rightRear.setPower(rr);
-    }
-
-    private double getPower(double rf, double scale, String engine) {
-        telemetry.addData(String.format("Power in %s", engine), "initial: %f; turbo: %b; scale: %f", rf, turbo, scale);
-        return rf / (isTurbo() ? 1.0 : 2.0) / scale;
-    }
-
-     public void sleep(int milis){
-        try{
-            Thread.sleep(milis);
-        } catch(Exception e) { }
-     }
 }

@@ -2,64 +2,46 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Servo;
 
 
-@TeleOp(name = "MainTeleOp")
+@TeleOp
 public class MainTeleOp extends OpMode {
     private Robot robot;
-    private FlagController flagLeft, flagRight;
-    private double lastFlagsToggleTime = 0.0;
 
     @Override
     public void init() {
         robot = new Robot(hardwareMap, telemetry);
-        robot.runUsingEncoders();
-
-        flagLeft = new FlagController(hardwareMap.servo.get("left_flag"), 0.3, 0);
-        flagRight = new FlagController(hardwareMap.servo.get("right_flag"), 0, 0.3);
-    }
-
-    @Override
-    public void stop() {
-        robot.stop();
+        robot.wheels.useEncoders(true);
     }
 
     @Override
     public void loop() {
-        robot.setTurbo(gamepad1.right_bumper);
+        // TODO: Better control scheme
 
-        double x = gamepad1.right_stick_x;
-        double y = gamepad1.right_trigger - gamepad1.left_trigger;
-
-        if (y == 0) {
-            robot.rotate(x);
-        } else {
-            robot.move(x, y);
-        }
-
-        if (gamepad1.y) {
-            robot.shakeGlass();
-        } else {
-            robot.stopShakingGlass();
-        }
-
+        double v = 0;
         if (gamepad1.dpad_up) {
-            robot.scissorsEngine.setPower(0.5);
-        }
-        else if (gamepad1.dpad_down) {
-            robot.scissorsEngine.setPower(-0.5);
-        }
-        else {
-            robot.moveScissorsEngine(0);
+            v = 1;
+        } else if (gamepad1.dpad_down) {
+            v = -1;
         }
 
-        if (gamepad2.x) {
-            if (lastFlagsToggleTime == 0.0 || (time - lastFlagsToggleTime) > 0.7) {
-                flagLeft.toggle();
-                flagRight.toggle();
-                lastFlagsToggleTime = time;
-            }
+        double h = 0;
+        if (gamepad1.dpad_right) {
+            h = 1;
+        } else if (gamepad1.dpad_left) {
+            h = -1;
         }
+
+        double r = gamepad1.left_stick_x;
+
+        if (isZero(v) && isZero(h) && isZero(r)) {
+            robot.wheels.stop();
+        } else {
+            robot.wheels.move(v, h, r);
+        }
+    }
+
+    private static boolean isZero(double value) {
+        return Math.abs(value) < 0.01;
     }
 }
