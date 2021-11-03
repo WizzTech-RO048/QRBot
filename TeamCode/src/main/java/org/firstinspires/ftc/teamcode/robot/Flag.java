@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.hardware.*;
 
-public class FlagController {
+public class Flag {
     private final Servo servo;
     private boolean raised = false;
     private final double startPos, endPos;
 
-    FlagController(Servo s, double start, double end) {
+    Flag(Servo s, double start, double end) {
         servo = s;
         startPos = start;
         endPos = end;
