@@ -167,17 +167,29 @@ public class Wheels {
     }
 
     static class Parameters {
+        /**
+         * The robot's hardware configuration.
+         */
         public HardwareMap hardwareMap = null;
+        /**
+         * The telemetry instance to send data to.
+         */
         public Telemetry telemetry = null;
+        /**
+         * The orientation sensor instance used when rotating.
+         */
         public BNO055IMU orientationSensor = null;
+        /**
+         * The executor service to be used for polling the orientation sensor when rotating.
+         */
         public ScheduledExecutorService scheduler = null;
 
         /**
-         * The PPR of the engine's encoder
+         * The PPR of the engine's encoder.
          */
         public double encoderResolution = 0;
         /**
-         * The rotations per minute of the engine
+         * The rotations per minute of the engine.
          */
         public double rpm = 0;
     }
