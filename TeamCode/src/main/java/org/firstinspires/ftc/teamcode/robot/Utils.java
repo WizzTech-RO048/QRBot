@@ -21,6 +21,10 @@ public class Utils {
         return a * factor + b * (1 - factor);
     }
 
+    public static boolean isDone(Future<?> f) {
+        return f == null || f.isDone();
+    }
+
     public static ScheduledFuture<?> poll(ScheduledExecutorService scheduler, Supplier<Boolean> fn, Runnable onEnd, long time, TimeUnit unit) {
         AtomicBoolean endCalled = new AtomicBoolean();
 

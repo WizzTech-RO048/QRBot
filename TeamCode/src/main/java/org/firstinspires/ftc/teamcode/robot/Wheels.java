@@ -143,7 +143,7 @@ public class Wheels {
     private ScheduledFuture<?> lastRotation = null;
 
     private boolean isRotating() {
-        return lastRotation != null && !lastRotation.isDone();
+        return !Utils.isDone(lastRotation);
     }
 
     public ScheduledFuture<?> rotateFor(double degrees) {
