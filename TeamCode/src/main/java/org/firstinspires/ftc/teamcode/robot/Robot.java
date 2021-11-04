@@ -26,8 +26,8 @@ public class Robot {
 
     private static final String HW_MOTOR_SCISSORS_ARM = "scissorsArm";
     private static final String HW_MOTOR_CONFETTI_BOWL = "confettiBowl";
-    private static final String HW_SERVO_FLAG_LEFT = "flagLeft";
-    private static final String HW_SERVO_FLAG_RIGHT = "flagRight";
+    private static final String HW_SERVO_FLAG_FRONT = "flagFront";
+    private static final String HW_SERVO_FLAG_REAR = "flagRear";
     private static final String HW_SERVO_SCISSORS = "scissors";
 
     public Robot(HardwareMap map, Telemetry telemetry) {
@@ -54,8 +54,8 @@ public class Robot {
 
         // FIXME: Rename flags to flagFront and flagRear, fix one of the flag's positions.
 
-        flagLeft = new Flag(map.servo.get(HW_SERVO_FLAG_LEFT), 0, 0.3);
-        flagRight = new Flag(map.servo.get(HW_SERVO_FLAG_RIGHT), 0, 0.3);
+        flagLeft = new Flag(map.servo.get(HW_SERVO_FLAG_FRONT), 0, 0.3);
+        flagRight = new Flag(map.servo.get(HW_SERVO_FLAG_REAR), 0, 0.3);
     }
 
     public void moveScissorsArm(double power) {
