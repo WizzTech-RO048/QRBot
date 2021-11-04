@@ -122,7 +122,7 @@ public class Wheels {
             input[i] /= highest;
         }
 
-        forEachEngine((engine, i) -> setPower(engine, input[i] * powerDistribution[i]));
+        forEachEngine((engine, i) -> setPower(engine, input[i]));
     }
 
     private void setPower(DcMotorEx engine, double power) {
