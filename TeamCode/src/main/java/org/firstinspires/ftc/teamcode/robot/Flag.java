@@ -29,6 +29,6 @@ public class Flag {
     }
 
     private static double lerp(double a, double b, double p) {
-        return a * (1 - p) + b * p;
+        return Utils.interpolate(a, b, p, 1);
     }
 }

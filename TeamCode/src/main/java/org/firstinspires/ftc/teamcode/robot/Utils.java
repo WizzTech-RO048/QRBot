@@ -13,6 +13,11 @@ public class Utils {
         return Math.max(min, Math.min(val, max));
     }
 
+    public static double interpolate(double a, double b, double p, double exp) {
+        double factor = Math.pow(1 - p, exp);
+        return a * factor + b * (1 - factor);
+    }
+
     public static ScheduledFuture<?> poll(ScheduledExecutorService scheduler, Supplier<Boolean> fn, Runnable onEnd, long time, TimeUnit unit) {
         AtomicBoolean endCalled = new AtomicBoolean();
 
