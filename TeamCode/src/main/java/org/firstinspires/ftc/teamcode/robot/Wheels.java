@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 import static java.util.concurrent.TimeUnit.*;
 
@@ -133,37 +134,92 @@ public class Wheels {
         }
     }
 
-    private double getOrientation() {
-         Orientation o = orientation.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-         return o.thirdAngle;
+    private double getOrientation(boolean direction) {
+        Orientation o = orientation.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+        double angle = o.thirdAngle > 0 ? o.thirdAngle : 360 + o.thirdAngle;
+        return direction ? angle : 360 - angle;
+    }
+
+    private ScheduledFuture<?> lastRotation = null;
+
+    private boolean isRotating() {
+        return lastRotation != null && !lastRotation.isDone();
     }
 
     public ScheduledFuture<?> rotateFor(double degrees) {
-        double startOrientation = getOrientation();
-        double expectedOrientation = (startOrientation + degrees) % 360.0;
+        if (Utils.isEqual(degrees, 0, 1e-4)) {
+            return null;
+        }
 
-        telemetry.addData("Rotation", "Start orientation: %f, Expected orientation: %f", startOrientation, expectedOrientation);
-        telemetry.update();
+        if (isRotating() && !lastRotation.cancel(true)) {
+            return null;
+        }
 
-        // FIXME: Find why this does not do what it is intented to.
+        double initialPower = -Math.signum(degrees);
+        boolean isPositiveDirection = Math.signum(degrees) > 0;
+        double startOrientation = getOrientation(isPositiveDirection);
+        double expectedOrientation = (startOrientation + Math.abs(degrees)) % 360;
 
-        move(0, 0, 0.5);
+        telemetry.addLine("New rotation")
+                .addData("Start orientation", startOrientation).setRetained(true)
+                .addData("Expected orientation", expectedOrientation).setRetained(true)
+                .addData("Initial power", initialPower).setRetained(true)
+                .addData("Is positive direction", isPositiveDirection).setRetained(true);
 
         return Utils.poll(
                 scheduler,
-                () -> Utils.isEqual(getOrientation(), expectedOrientation, 0.1),
-                this::stop,
-                10,
+                new Supplier<Boolean>() {
+                    private double rotation = Math.abs(degrees);
+                    private double prevOrientation = startOrientation;
+
+                    @Override
+                    public Boolean get() {
+                        double currentOrientation = getOrientation(isPositiveDirection);
+                        double delta = currentOrientation - prevOrientation;
+                        prevOrientation = currentOrientation;
+                        rotation -= delta >= 0 ? delta : 360 + delta;
+
+                        telemetry.addData("Rotation left", rotation).setRetained(true);
+
+                        if (Utils.isEqual(rotation, 0, 5e-1)) {
+                            return true;
+                        }
+
+                        move(0, 0, normalizeRotationPower(initialPower, rotation));
+                        return false;
+                    }
+                },
+                () -> {
+                    stopMotors();
+                    telemetry.addData("End orientation", getOrientation(isPositiveDirection)).setRetained(true);
+                },
+                5,
                 MILLISECONDS
         );
     }
 
-    public void stop() {
+    private void stopMotors() {
         forEachEngine((engine, _i) -> setPower(engine, 0.0));
+    }
+
+    public void stop() {
+        if (isRotating() && lastRotation.cancel(true)) {
+            return;
+        }
+
+        stopMotors();
     }
 
     private static double normalize(double val) {
         return Utils.clamp(val, -1, 1);
+    }
+
+    private static double normalizeRotationPower(double initialPower, double degreesLeft) {
+        if (degreesLeft > 60) {
+            return initialPower;
+        }
+
+        return Utils.interpolate(initialPower, Math.signum(initialPower) * 0.05, (60 - degreesLeft) / 60, 1.1);
     }
 
     static class Parameters {
