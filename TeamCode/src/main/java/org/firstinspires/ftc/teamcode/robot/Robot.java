@@ -13,10 +13,8 @@ import java.util.concurrent.*;
 public class Robot {
     public final Wheels wheels;
     public final Flag flagLeft, flagRight;
-
+    public final Scissors scissors;
     private final DcMotor confettiBowl;
-    private final DcMotor scissorsArm;
-    private final Servo scissor;
 
     private final BNO055IMU orientation;
 
@@ -24,11 +22,14 @@ public class Robot {
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    private static final String HW_MOTOR_SCISSORS_ARM = "scissorsArm";
-    private static final String HW_MOTOR_CONFETTI_BOWL = "confettiBowl";
-    private static final String HW_SERVO_FLAG_FRONT = "flagFront";
-    private static final String HW_SERVO_FLAG_REAR = "flagRear";
-    private static final String HW_SERVO_SCISSORS = "scissors";
+    private static final String
+            HW_MOTOR_SCISSORS_ARM = "scissorsArm",
+            HW_MOTOR_CONFETTI_BOWL = "confettiBowl",
+            HW_SERVO_FLAG_FRONT = "flagFront",
+            HW_SERVO_FLAG_REAR = "flagRear",
+            HW_SERVO_SCISSORS = "scissors";
+
+    private static final int SCISSORS_ARM_FINAL_POS = 12525;
 
     public Robot(HardwareMap map, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -36,29 +37,32 @@ public class Robot {
         orientation = map.get(BNO055IMU.class, "imu");
         orientation.initialize(new BNO055IMU.Parameters());
 
-        Wheels.Parameters params = new Wheels.Parameters();
-        params.hardwareMap = map;
-        params.telemetry = this.telemetry;
-        params.orientationSensor = orientation;
-        params.scheduler = scheduler;
-        params.rpm = 435;
-        params.encoderResolution = 384.5;
-        wheels = new Wheels(params);
+        Wheels.Parameters wheelsParams = new Wheels.Parameters();
+        wheelsParams.hardwareMap = map;
+        wheelsParams.telemetry = this.telemetry;
+        wheelsParams.orientationSensor = orientation;
+        wheelsParams.scheduler = scheduler;
+        wheelsParams.rpm = 435;
+        wheelsParams.encoderResolution = 384.5;
+        wheels = new Wheels(wheelsParams);
+
+        Scissors.Parameters scissorsParams = new Scissors.Parameters();
+        scissorsParams.arm = map.get(DcMotorEx.class, HW_MOTOR_SCISSORS_ARM);
+        scissorsParams.scissors = map.servo.get(HW_SERVO_SCISSORS);
+        scissorsParams.scheduler = scheduler;
+        scissorsParams.telemetry = this.telemetry;
+        scissorsParams.armRaisedPosition = SCISSORS_ARM_FINAL_POS;
+        scissors = new Scissors(scissorsParams);
 
         confettiBowl = map.dcMotor.get(HW_MOTOR_CONFETTI_BOWL);
 
-        scissorsArm = map.dcMotor.get(HW_MOTOR_SCISSORS_ARM);
-        scissorsArm.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        scissor = map.servo.get(HW_SERVO_SCISSORS);
-
-        // FIXME: Rename flags to flagFront and flagRear, fix one of the flag's positions.
+        // FIXME: fix one of the flag's positions.
 
         flagLeft = new Flag(map.servo.get(HW_SERVO_FLAG_FRONT), 0, 0.3);
         flagRight = new Flag(map.servo.get(HW_SERVO_FLAG_REAR), 0, 0.3);
     }
 
-    public void moveScissorsArm(double power) {
-        scissorsArm.setPower(power);
+    public void spinConfettiBowl(double power) {
+        confettiBowl.setPower(power);
     }
 }

@@ -18,13 +18,22 @@ public class MainTeleOp extends OpMode {
 
     private double angle = 0;
     private double lastAngleSet = 0;
-    private ScheduledFuture<?> lastRotation = null;
+    private boolean isArmRaised = false;
+    private ScheduledFuture<?> lastRotation = null, lastScissorsArmRaise = null;
 
     private double lastFlagsToggle = 0;
 
     @Override
     public void stop() {
         robot.wheels.stop();
+        if (lastScissorsArmRaise != null) {
+            lastScissorsArmRaise.cancel(true);
+        }
+        isArmRaised = false;
+
+        try {
+            robot.scissors.moveArm(0).get();
+        } catch (Exception ignored) {}
     }
 
     private boolean isRotating() {
@@ -45,12 +54,10 @@ public class MainTeleOp extends OpMode {
             }
         }
 
-        if (gamepad1.dpad_up) {
-            robot.moveScissorsArm(1);
-        } else if (gamepad1.dpad_down) {
-            robot.moveScissorsArm(-1);
-        } else {
-            robot.moveScissorsArm(0);
+        if ((lastScissorsArmRaise == null || lastScissorsArmRaise.isDone()) && gamepad1.y) {
+            isArmRaised = !isArmRaised;
+            telemetry.addData("Is arm raised", isArmRaised);
+            lastScissorsArmRaise = robot.scissors.moveArm(isArmRaised ? 1 : 0);
         }
 
         boolean allowSetAngle = !Utils.inVicinity(lastAngleSet, time, 0.2);
@@ -62,6 +69,8 @@ public class MainTeleOp extends OpMode {
                 lastAngleSet = time;
                 angle -= 15;
             }
+
+            telemetry.addData("Angle", angle);
 
             if (!isRotating() && gamepad1.x && angle != 0) {
                 lastRotation = robot.wheels.rotateFor(angle);
