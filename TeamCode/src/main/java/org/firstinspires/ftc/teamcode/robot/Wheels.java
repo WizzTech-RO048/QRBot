@@ -28,7 +28,6 @@ public class Wheels {
 
     private final double encoderTicksPerSecond;
     private final List<DcMotorEx> engines;
-    private final double[] powerDistribution;
 
     private final BNO055IMU orientation;
     private final Telemetry telemetry;
@@ -65,13 +64,6 @@ public class Wheels {
             this.encoderTicksPerSecond = 0;
             useEncoders(false);
         }
-
-        powerDistribution = new double[]{
-                params.distributionLeftFront,
-                params.distributionLeftRear,
-                params.distributionRightFront,
-                params.distributionRightRear
-        };
 
         useBrakes(true);
     }
@@ -186,23 +178,6 @@ public class Wheels {
          * The rotations per minute of the engine
          */
         public double rpm = 0;
-
-        /**
-         * The percentage of the given power that is distributed to the engine on the front left side of the robot.
-         */
-        public double distributionLeftFront = 1;
-        /**
-         * The percentage of the given power that is distributed to the engine on the rear left side of the robot.
-         */
-        public double distributionLeftRear = 1;
-        /**
-         * The percentage of the given power that is distributed to the engine on the front right side of the robot.
-         */
-        public double distributionRightFront = 1;
-        /**
-         * The percentage of the given power that is distributed to the engine on the rear right side of the robot.
-         */
-        public double distributionRightRear = 1;
     }
 
     @FunctionalInterface
