@@ -45,9 +45,11 @@ public class Wheels {
         this.orientation = Objects.requireNonNull(params.orientationSensor, "Orientation sensor was not set");
         this.scheduler = Objects.requireNonNull(params.scheduler, "Scheduler was not set");
 
+        HardwareMap map = Objects.requireNonNull(params.hardwareMap, "Hardware map was not passed");
         ArrayList<DcMotorEx> engines = new ArrayList<>();
+
         for (String name : HW_MOTOR_NAMES) {
-            engines.add(getEngine(Objects.requireNonNull(params.hardwareMap, "Hardware map was not passed"), name));
+            engines.add(getEngine(map, name));
         }
 
         // FIXME: This is a hack, it's a hardware problem that the left rear wheel spins in reverse.
