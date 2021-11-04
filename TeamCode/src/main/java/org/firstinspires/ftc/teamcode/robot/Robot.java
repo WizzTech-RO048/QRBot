@@ -12,15 +12,9 @@ import java.util.concurrent.*;
 
 public class Robot {
     public final Wheels wheels;
-    public final Flag flagLeft, flagRight;
+    public final Flag flagFront, flagRear;
     public final Scissors scissors;
     private final DcMotor confettiBowl;
-
-    private final BNO055IMU orientation;
-
-    private final Telemetry telemetry;
-
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     private static final String
             HW_MOTOR_SCISSORS_ARM = "scissorsArm",
@@ -32,14 +26,14 @@ public class Robot {
     private static final int SCISSORS_ARM_FINAL_POS = 12525;
 
     public Robot(HardwareMap map, Telemetry telemetry) {
-        this.telemetry = telemetry;
-
-        orientation = map.get(BNO055IMU.class, "imu");
+        BNO055IMU orientation = map.get(BNO055IMU.class, "imu");
         orientation.initialize(new BNO055IMU.Parameters());
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
         Wheels.Parameters wheelsParams = new Wheels.Parameters();
         wheelsParams.hardwareMap = map;
-        wheelsParams.telemetry = this.telemetry;
+        wheelsParams.telemetry = telemetry;
         wheelsParams.orientationSensor = orientation;
         wheelsParams.scheduler = scheduler;
         wheelsParams.rpm = 435;
@@ -50,16 +44,17 @@ public class Robot {
         scissorsParams.arm = map.get(DcMotorEx.class, HW_MOTOR_SCISSORS_ARM);
         scissorsParams.scissors = map.servo.get(HW_SERVO_SCISSORS);
         scissorsParams.scheduler = scheduler;
-        scissorsParams.telemetry = this.telemetry;
+        scissorsParams.telemetry = telemetry;
         scissorsParams.armRaisedPosition = SCISSORS_ARM_FINAL_POS;
         scissors = new Scissors(scissorsParams);
 
         confettiBowl = map.dcMotor.get(HW_MOTOR_CONFETTI_BOWL);
+        confettiBowl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // FIXME: fix one of the flag's positions.
 
-        flagLeft = new Flag(map.servo.get(HW_SERVO_FLAG_FRONT), 0, 0.3);
-        flagRight = new Flag(map.servo.get(HW_SERVO_FLAG_REAR), 0, 0.3);
+        flagFront = new Flag(map.servo.get(HW_SERVO_FLAG_FRONT));
+        flagRear = new Flag(map.servo.get(HW_SERVO_FLAG_REAR));
     }
 
     public void spinConfettiBowl(double power) {
