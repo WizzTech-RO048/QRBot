@@ -63,12 +63,7 @@ public class MainTeleOp extends OpMode {
                 angle -= 15;
             }
 
-            telemetry.addData("Angle", "%f degrees", angle);
-
             if (!isRotating() && gamepad1.x && angle != 0) {
-                telemetry.clearAll();
-                telemetry.addLine("Executing rotation");
-
                 lastRotation = robot.wheels.rotateFor(angle);
                 angle = 0;
             }
