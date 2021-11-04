@@ -51,10 +51,10 @@ public class Robot {
         confettiBowl = map.dcMotor.get(HW_MOTOR_CONFETTI_BOWL);
         confettiBowl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // FIXME: fix one of the flag's positions.
-
-        flagFront = new Flag(map.servo.get(HW_SERVO_FLAG_FRONT));
-        flagRear = new Flag(map.servo.get(HW_SERVO_FLAG_REAR));
+        Servo flagFrontServo = map.servo.get(HW_SERVO_FLAG_FRONT);
+        flagFrontServo.setDirection(Servo.Direction.REVERSE);
+        flagFront = new Flag(flagFrontServo, 0.7, 1);
+        flagRear = new Flag(map.servo.get(HW_SERVO_FLAG_REAR), 0, 0.3);
     }
 
     public void spinConfettiBowl(double power) {
