@@ -147,7 +147,7 @@ public class Wheels {
     }
 
     public ScheduledFuture<?> rotateFor(double degrees) {
-        if (Utils.isEqual(degrees, 0, 1e-4)) {
+        if (Utils.inVicinity(degrees, 0, 1e-4)) {
             return null;
         }
 
@@ -181,7 +181,7 @@ public class Wheels {
 
                         telemetry.addData("Rotation left", rotation).setRetained(true);
 
-                        if (Utils.isEqual(rotation, 0, 5e-1)) {
+                        if (Utils.inVicinity(rotation, 0, 5e-1)) {
                             return true;
                         }
 

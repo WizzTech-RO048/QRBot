@@ -53,7 +53,7 @@ public class MainTeleOp extends OpMode {
             robot.moveScissorsArm(0);
         }
 
-        boolean allowSetAngle = !Utils.isEqual(lastAngleSet, time, 0.2);
+        boolean allowSetAngle = !Utils.inVicinity(lastAngleSet, time, 0.2);
         if (allowSetAngle) {
             if (gamepad1.dpad_right) {
                 lastAngleSet = time;
@@ -74,7 +74,7 @@ public class MainTeleOp extends OpMode {
             }
         }
 
-        boolean allowToggleFlags = !Utils.isEqual(lastFlagsToggle, time, 0.7);
+        boolean allowToggleFlags = !Utils.inVicinity(lastFlagsToggle, time, 0.7);
         if (allowToggleFlags && gamepad1.b) {
             lastFlagsToggle = time;
             robot.flagLeft.toggle();
@@ -83,6 +83,6 @@ public class MainTeleOp extends OpMode {
     }
 
     private static boolean isZero(double value) {
-        return Utils.isEqual(value, 0, 0.01);
+        return Utils.inVicinity(value, 0, 0.01);
     }
 }

@@ -5,8 +5,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 public class Utils {
-    public static boolean isEqual(double lhs, double rhs, double tolerance) {
-        return Math.abs(lhs - rhs) < tolerance;
+    /**
+     * Checks if lhs is in the interval (rhs - interval, rhs + interval).
+     */
+    public static boolean inVicinity(double lhs, double rhs, double interval) {
+        return Math.abs(lhs - rhs) < interval;
     }
 
     public static double clamp(double val, double min, double max) {
