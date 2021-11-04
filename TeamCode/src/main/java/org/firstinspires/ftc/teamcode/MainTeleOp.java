@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.robot.*;
 
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.*;
 
 
 @TeleOp
@@ -14,12 +14,14 @@ public class MainTeleOp extends OpMode {
     @Override
     public void init() {
         robot = new Robot(hardwareMap, telemetry);
+        msStuckDetectStop = 5000;
     }
 
     private double angle = 0;
-    private double lastAngleSet = 0;
+    private double lastAngleSet = 0, lastBowlSpeedSet = 0;
     private boolean isArmRaised = false;
-    private ScheduledFuture<?> lastRotation = null, lastScissorsArmRaise = null;
+    private double bowlSpeed = 0;
+    private ScheduledFuture<?> lastRotation = null, lastScissorsArmRaise = null, lastCut = null;
 
     private double lastFlagsToggle = 0;
 
@@ -31,13 +33,17 @@ public class MainTeleOp extends OpMode {
         }
         isArmRaised = false;
 
+        if (lastCut != null) {
+            lastCut.cancel(true);
+        }
+
+        robot.spinConfettiBowl(0);
+        robot.flagFront.toggle(0, 0);
+        robot.flagRear.toggle(0, 0);
+
         try {
             robot.scissors.moveArm(0).get();
         } catch (Exception ignored) {}
-    }
-
-    private boolean isRotating() {
-        return lastRotation != null && !lastRotation.isDone();
     }
 
     @Override
@@ -46,7 +52,7 @@ public class MainTeleOp extends OpMode {
         double x = Math.signum(gamepad1.right_stick_x) * Math.hypot(gamepad1.right_stick_x, gamepad1.right_stick_y);
         double r = gamepad1.left_stick_x;
 
-        if (!isRotating()) {
+        if (Utils.isDone(lastRotation)) {
             if (isZero(x) && isZero(y) && isZero(r)) {
                 robot.wheels.stop();
             } else {
@@ -54,7 +60,7 @@ public class MainTeleOp extends OpMode {
             }
         }
 
-        if ((lastScissorsArmRaise == null || lastScissorsArmRaise.isDone()) && gamepad1.y) {
+        if (Utils.isDone(lastScissorsArmRaise) && gamepad1.y) {
             isArmRaised = !isArmRaised;
             telemetry.addData("Is arm raised", isArmRaised);
             lastScissorsArmRaise = robot.scissors.moveArm(isArmRaised ? 1 : 0);
@@ -72,7 +78,7 @@ public class MainTeleOp extends OpMode {
 
             telemetry.addData("Angle", angle);
 
-            if (!isRotating() && gamepad1.x && angle != 0) {
+            if (Utils.isDone(lastRotation) && gamepad1.x && angle != 0) {
                 lastRotation = robot.wheels.rotateFor(angle);
                 angle = 0;
             }
@@ -81,9 +87,26 @@ public class MainTeleOp extends OpMode {
         boolean allowToggleFlags = !Utils.inVicinity(lastFlagsToggle, time, 0.7);
         if (allowToggleFlags && gamepad1.b) {
             lastFlagsToggle = time;
-            robot.flagLeft.toggle();
-            robot.flagRight.toggle();
+            robot.flagFront.toggle();
+            robot.flagRear.toggle();
         }
+
+        double bowlSpeedIncr = 0;
+
+        if (gamepad1.right_bumper) {
+            bowlSpeedIncr = 0.1;
+        } else if (gamepad1.left_bumper) {
+            bowlSpeedIncr = -0.1;
+        }
+
+        if (bowlSpeedIncr != 0 && !Utils.inVicinity(lastBowlSpeedSet, time, 0.2)) {
+            lastBowlSpeedSet = time;
+            bowlSpeed = Utils.clamp(bowlSpeed + bowlSpeedIncr, 0, 1);
+        }
+
+        telemetry.addData("Bowl speed", bowlSpeed);
+
+        robot.spinConfettiBowl(bowlSpeed);
     }
 
     private static boolean isZero(double value) {
