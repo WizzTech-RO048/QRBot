@@ -14,7 +14,6 @@ public class MainTeleOp extends OpMode {
     @Override
     public void init() {
         robot = new Robot(hardwareMap, telemetry);
-        robot.wheels.useEncoders(true);
     }
 
     private double angle = 0;
@@ -26,26 +25,30 @@ public class MainTeleOp extends OpMode {
     @Override
     public void stop() {
         robot.wheels.stop();
-        robot.flagRight.toggle(0, 0);
-        robot.flagLeft.toggle(0, 0);
+    }
+
+    private boolean isRotating() {
+        return lastRotation != null && !lastRotation.isDone();
     }
 
     @Override
     public void loop() {
         double y = gamepad1.right_trigger - gamepad1.left_trigger;
-        double x = gamepad1.right_stick_x * 1.1;
+        double x = Math.signum(gamepad1.right_stick_x) * Math.hypot(gamepad1.right_stick_x, gamepad1.right_stick_y);
         double r = gamepad1.left_stick_x;
 
-        if (isZero(x) && isZero(y) && isZero(r)) {
-            robot.wheels.stop();
-        } else {
-            robot.wheels.move(x, y, r);
+        if (!isRotating()) {
+            if (isZero(x) && isZero(y) && isZero(r)) {
+                robot.wheels.stop();
+            } else {
+                robot.wheels.move(x, y, r);
+            }
         }
 
         if (gamepad1.dpad_up) {
-            robot.moveScissorsArm(-1);
-        } else if (gamepad1.dpad_down) {
             robot.moveScissorsArm(1);
+        } else if (gamepad1.dpad_down) {
+            robot.moveScissorsArm(-1);
         } else {
             robot.moveScissorsArm(0);
         }
@@ -54,13 +57,18 @@ public class MainTeleOp extends OpMode {
         if (allowSetAngle) {
             if (gamepad1.dpad_right) {
                 lastAngleSet = time;
-                angle += 5;
+                angle += 15;
             } else if (gamepad1.dpad_left) {
                 lastAngleSet = time;
-                angle -= 5;
+                angle -= 15;
             }
 
-            if ((lastRotation == null || lastRotation.isDone()) && gamepad1.x && angle != 0) {
+            telemetry.addData("Angle", "%f degrees", angle);
+
+            if (!isRotating() && gamepad1.x && angle != 0) {
+                telemetry.clearAll();
+                telemetry.addLine("Executing rotation");
+
                 lastRotation = robot.wheels.rotateFor(angle);
                 angle = 0;
             }
