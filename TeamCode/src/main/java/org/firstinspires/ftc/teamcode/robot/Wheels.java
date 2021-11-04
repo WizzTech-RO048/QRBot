@@ -156,21 +156,13 @@ public class Wheels {
         }
 
         double initialPower = -Math.signum(degrees);
-        boolean isPositiveDirection = Math.signum(degrees) > 0;
-        double startOrientation = getOrientation(isPositiveDirection);
-        double expectedOrientation = (startOrientation + Math.abs(degrees)) % 360;
+        boolean isPositiveDirection = initialPower < 0;
 
-        telemetry.addLine("New rotation")
-                .addData("Start orientation", startOrientation).setRetained(true)
-                .addData("Expected orientation", expectedOrientation).setRetained(true)
-                .addData("Initial power", initialPower).setRetained(true)
-                .addData("Is positive direction", isPositiveDirection).setRetained(true);
-
-        return Utils.poll(
+        lastRotation = Utils.poll(
                 scheduler,
                 new Supplier<Boolean>() {
                     private double rotation = Math.abs(degrees);
-                    private double prevOrientation = startOrientation;
+                    private double prevOrientation = getOrientation(isPositiveDirection);
 
                     @Override
                     public Boolean get() {
@@ -179,9 +171,7 @@ public class Wheels {
                         prevOrientation = currentOrientation;
                         rotation -= delta >= 0 ? delta : 360 + delta;
 
-                        telemetry.addData("Rotation left", rotation).setRetained(true);
-
-                        if (Utils.inVicinity(rotation, 0, 5e-1)) {
+                        if (rotation < 0.5) {
                             return true;
                         }
 
@@ -189,13 +179,12 @@ public class Wheels {
                         return false;
                     }
                 },
-                () -> {
-                    stopMotors();
-                    telemetry.addData("End orientation", getOrientation(isPositiveDirection)).setRetained(true);
-                },
+                this::stopMotors,
                 5,
                 MILLISECONDS
         );
+
+        return lastRotation;
     }
 
     private void stopMotors() {
