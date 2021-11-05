@@ -17,7 +17,8 @@ public class MainTeleOp extends OpMode {
     public void init() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         robot = new Robot(hardwareMap, telemetry);
-        msStuckDetectStop = 5000;
+        // We greatly increase the stop function timeout duration so the scissors' arm has time to lower.
+        msStuckDetectStop = 15000;
     }
 
     private double angle = 0;
@@ -44,6 +45,8 @@ public class MainTeleOp extends OpMode {
         robot.flagFront.toggle(0, 0);
         robot.flagRear.toggle(0, 0);
 
+        robot.scissors.cancelCut();
+
         try {
             robot.scissors.moveArm(0).get();
         } catch (Exception ignored) {}
@@ -52,7 +55,7 @@ public class MainTeleOp extends OpMode {
     @Override
     public void loop() {
         double y = gamepad1.right_trigger - gamepad1.left_trigger;
-        double x = Math.signum(gamepad1.right_stick_x) * Math.hypot(gamepad1.right_stick_x, gamepad1.right_stick_y);
+        double x = gamepad1.right_stick_x;
         double r = gamepad1.left_stick_x;
 
         if (Utils.isDone(lastRotation)) {
@@ -67,6 +70,10 @@ public class MainTeleOp extends OpMode {
             isArmRaised = !isArmRaised;
             telemetry.addData("Is arm raised", isArmRaised);
             lastScissorsArmRaise = robot.scissors.moveArm(isArmRaised ? 1 : 0);
+        }
+
+        if (Utils.isDone(lastCut) && gamepad1.a) {
+            lastCut = robot.scissors.cut();
         }
 
         boolean allowSetAngle = !Utils.inVicinity(lastAngleSet, time, 0.2);
@@ -110,6 +117,16 @@ public class MainTeleOp extends OpMode {
         telemetry.addData("Bowl speed", bowlSpeed);
 
         robot.spinConfettiBowl(bowlSpeed);
+
+        if (Utils.isDone(lastScissorsArmRaise)) {
+            if (gamepad1.dpad_up) {
+                robot.scissors.move(1);
+            } else if (gamepad1.dpad_down) {
+                robot.scissors.move(-1);
+            } else {
+                robot.scissors.move(0);
+            }
+        }
     }
 
     private static boolean isZero(double value) {
