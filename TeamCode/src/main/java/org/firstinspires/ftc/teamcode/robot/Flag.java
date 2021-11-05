@@ -25,7 +25,7 @@ public class Flag {
     }
 
     private void raise(double start, double end) {
-        servo.setPosition(raised ? lerp(startPos, endPos, start) : lerp(startPos, endPos, end));
+        servo.setPosition(lerp(startPos, endPos, raised ? start : end));
     }
 
     private static double lerp(double a, double b, double p) {
