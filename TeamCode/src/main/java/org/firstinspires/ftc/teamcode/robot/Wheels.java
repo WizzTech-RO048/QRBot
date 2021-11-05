@@ -146,6 +146,22 @@ public class Wheels {
         return !Utils.isDone(lastRotation);
     }
 
+    /**
+     * Rotates the robot for the given number of degrees.
+     *
+     * For positive values, the robot rotates counter-clockwise.
+     * Provide negative values for clockwise rotation.
+     *
+     * Values are in degrees, not radians. The robot can rotate
+     * multiple times around itself: for a value of 720, the robot
+     * will rotate twice around its axis.
+     *
+     * @param degrees The number of degrees to rotate the robot.
+     *
+     * @return A future that completes when the rotation is complete.
+     * Canceling this future will cancel the rotation, with the robot
+     * stopping any movement immediately.
+     */
     public ScheduledFuture<?> rotateFor(double degrees) {
         if (Utils.inVicinity(degrees, 0, 1e-4)) {
             return null;
@@ -191,6 +207,9 @@ public class Wheels {
         forEachEngine((engine, _i) -> setPower(engine, 0.0));
     }
 
+    /**
+     * Stop any movement or rotation of the robot.
+     */
     public void stop() {
         if (isRotating() && lastRotation.cancel(true)) {
             return;

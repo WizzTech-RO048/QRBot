@@ -11,9 +11,19 @@ import java.util.concurrent.*;
 
 
 public class Robot {
+    /**
+     * The robot's wheels. Control its movement using the methods on this object.
+     */
     public final Wheels wheels;
+    /**
+     * The robot's flags. Raise or lower them using these objects.
+     */
     public final Flag flagFront, flagRear;
+    /**
+     * The robot's scissors mechanism. Raise or lower the scissors' arm and move the scissors themselves using this object.
+     */
     public final Scissors scissors;
+
     private final DcMotor confettiBowl;
 
     private static final String
@@ -57,6 +67,11 @@ public class Robot {
         flagRear = new Flag(map.servo.get(HW_SERVO_FLAG_REAR), 0, 0.3);
     }
 
+    /**
+     * Spin the confetti bowl.
+     *
+     * @param power The power to spin the conffeti bowl with. Provide zero so the bowl stops spinning.
+     */
     public void spinConfettiBowl(double power) {
         confettiBowl.setPower(power);
     }

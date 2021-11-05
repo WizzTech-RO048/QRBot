@@ -12,6 +12,9 @@ public class Utils {
         return Math.abs(lhs - rhs) < interval;
     }
 
+    /**
+     * Clip the value if necessary, so it fits in the [min, max] interval.
+     */
     public static double clamp(double val, double min, double max) {
         return Math.max(min, Math.min(val, max));
     }
@@ -21,10 +24,24 @@ public class Utils {
         return a * factor + b * (1 - factor);
     }
 
+    /**
+     * Check if the future has completed.
+     */
     public static boolean isDone(Future<?> f) {
         return f == null || f.isDone();
     }
 
+    /**
+     * Check a condition until it is true at the given interval.
+     *
+     * @param scheduler The executor service to use for spawning the poll thread.
+     * @param fn The condition.
+     * @param onEnd An action to run when the returned future is canceled or the condition is true and polling stops.
+     * @param time The interval to poll the condition at.
+     * @param unit The time unit of the interval.
+     * @return A future that completes when the condition is true. Canceling this future will run the provided end action,
+     * if necessary.
+     */
     public static ScheduledFuture<?> poll(ScheduledExecutorService scheduler, Supplier<Boolean> fn, Runnable onEnd, long time, TimeUnit unit) {
         AtomicBoolean endCalled = new AtomicBoolean();
 
