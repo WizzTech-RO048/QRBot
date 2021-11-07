@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.robot.*;
 
+import com.qualcomm.robotcore.hardware.Servo;
+
 import java.util.concurrent.*;
 
 
@@ -16,7 +18,7 @@ public class MainTeleOp extends OpMode {
     @Override
     public void init() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        robot = new Robot(hardwareMap, telemetry);
+        robot = new Robot(hardwareMap, telemetry, Executors.newScheduledThreadPool(1));
         // We greatly increase the stop function timeout duration so the scissors' arm has time to lower.
         msStuckDetectStop = 15000;
     }
@@ -125,6 +127,12 @@ public class MainTeleOp extends OpMode {
                 robot.scissors.move(-1);
             } else {
                 robot.scissors.move(0);
+            }
+            if(gamepad1.dpad_down){
+                robot.cameraDown();
+            }
+            if(gamepad1.dpad_up){
+                robot.cameraUp();
             }
         }
     }

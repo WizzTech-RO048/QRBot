@@ -25,6 +25,8 @@ public class Robot {
     public final Scissors scissors;
 
     private final DcMotor confettiBowl;
+    private Servo cameraServo;
+
 
     private static final String
             HW_MOTOR_SCISSORS_ARM = "scissorsArm",
@@ -35,11 +37,9 @@ public class Robot {
 
     private static final int SCISSORS_ARM_FINAL_POS = 12525;
 
-    public Robot(HardwareMap map, Telemetry telemetry) {
+    public Robot(HardwareMap map, Telemetry telemetry, ScheduledExecutorService scheduler) {
         BNO055IMU orientation = map.get(BNO055IMU.class, "imu");
         orientation.initialize(new BNO055IMU.Parameters());
-
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
         Wheels.Parameters wheelsParams = new Wheels.Parameters();
         wheelsParams.hardwareMap = map;
@@ -65,6 +65,8 @@ public class Robot {
         flagFrontServo.setDirection(Servo.Direction.REVERSE);
         flagFront = new Flag(flagFrontServo, 0.7, 1);
         flagRear = new Flag(map.servo.get(HW_SERVO_FLAG_REAR), 0, 0.3);
+
+        cameraServo = map.servo.get("cameraServo");
     }
 
     /**
@@ -75,4 +77,7 @@ public class Robot {
     public void spinConfettiBowl(double power) {
         confettiBowl.setPower(power);
     }
+
+    public void cameraUp(){ cameraServo.setPosition(0.05); }
+    public void cameraDown(){ cameraServo.setPosition(0.7); }
 }
